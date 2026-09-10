@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Central PostgreSQL + PostGIS Database
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: urban-intel-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: urban_user
+      POSTGRES_PASSWORD: urban_password_123
+      POSTGRES_DB: urban_intelligence
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U urban_user -d urban_intelligence"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Central FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: urban-intel-backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://urban_user:urban_password_123@postgres:5432/urban_intelligence
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:80
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - evidence_storage:/app/evidence
+
+  # Command Center Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: urban-intel-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  # Autonomous Bus & Telemetry Simulator
+  simulator:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: urban-intel-simulator
+    restart: on-failure
+    command: ["python", "simulator/run_simulation.py", "http://backend:8000"]
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  evidence_storage:

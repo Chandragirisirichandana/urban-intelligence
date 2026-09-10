@@ -1,0 +1,19 @@
+# =============================================================================
+# Traffic & Vehicle Classification - Dataset Configuration (YOLOv8 Format)
+# Benchmark Reference: Indian Driving Dataset (IDD) + COCO Traffic Subsets
+# =============================================================================
+
+path: ../datasets/traffic
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: car
+  1: bus
+  2: truck
+  3: motorcycle
+  4: auto_rickshaw
+  5: bicycle
+  6: emergency
+  7: pedestrian

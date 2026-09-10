@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+*.whl
+
+# Node
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database
+*.db
+*.sqlite3
+
+# ML Artifacts
+ml/artifacts/*.pt
+ml/artifacts/*.pth
+ml/artifacts/*.onnx
+ml/artifacts/*.weights
+ml/datasets/raw/
+ml/datasets/processed/
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Evidence uploads
+backend/uploads/
+backend/evidence/
+
+# Temp
+tmp/
+temp/
+scratch/

@@ -1,0 +1,22 @@
+# =============================================================================
+# Road Defect Detection - Dataset Configuration (YOLOv8 Format)
+# Benchmark Reference: Road Damage Dataset (RDD2022) + Urban Mobile Sensing
+# =============================================================================
+
+path: ../datasets/road_defects  # dataset root dir
+train: images/train            # train images (relative to 'path')
+val: images/val                # val images (relative to 'path')
+test: images/test              # test images (optional)
+
+# Classes
+names:
+  0: pothole
+  1: longitudinal_crack
+  2: transverse_crack
+  3: alligator_crack
+  4: waterlogging
+  5: damaged_divider
+  6: missing_divider
+  7: damaged_sign
+  8: missing_sign
+  9: missing_zebra
