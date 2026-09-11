@@ -45,7 +45,9 @@ class IncidentProcessor:
         current_bbox: List[float],
         estimated_speed_kmh: float,
         is_bus_stationary: bool = False,
-        near_collision: bool = False
+        near_collision: bool = False,
+        collision_confirmed: bool = False,
+        departure_confirmed: bool = False
     ) -> Optional[IncidentDetection]:
         """
         Evaluates a vehicle's multi-frame trajectory and dynamics.
@@ -83,21 +85,21 @@ class IncidentProcessor:
 
         # 4. Check for Hit-and-Run conditions
         # Severe near collision followed by sudden acceleration away
-        if near_collision and estimated_speed_kmh > 45.0:
+        if collision_confirmed and departure_confirmed:
             return IncidentDetection(
                 incident_id=f"inc_{uuid.uuid4().hex[:8]}",
                 incident_type="hit_and_run",
                 severity="critical",
-                confidence=0.92,
+                confidence=0.0,  # No calibrated probability is available for this rule.
                 vehicle_track_id=track_id,
                 vehicle_type=vehicle_type,
                 speed_kmh=round(estimated_speed_kmh, 1),
                 trajectory=[[p[0], p[1]] for p in history],
                 requires_anpr=True,
                 explainability=[
-                    f"Collision proximity trigger: vehicle #{track_id} ({vehicle_type}) was involved in high-deceleration contact zone",
-                    f"Rapid acceleration and departure observed immediately following impact ({round(estimated_speed_kmh, 1)} km/h)",
-                    "High priority ANPR number-plate extraction dispatched"
+                    f"Caller supplied collision confirmation for vehicle #{track_id} ({vehicle_type})",
+                    "Caller supplied post-collision departure confirmation; manual review required",
+                    "ANPR requested; confidence is uncalibrated (0.0 sentinel), not a probability"
                 ]
             )
 

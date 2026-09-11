@@ -135,3 +135,19 @@ Use the top-right **`DEMO SCENARIOS`** dropdown on the command center header to 
 ## 8. License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Data provenance and current limitations
+
+Copy `frontend/.env.example` to `frontend/.env` before local startup. Set
+`VITE_API_BASE_URL` to your backend API URL (including `/api`). Without it,
+the frontend requests same-origin `/api`; hosting must proxy this path.
+Set `VITE_DEMO_MODE=true` explicitly to use the standalone demonstration.
+Restart Vite after changing these values; production builds embed them.
+
+Backend mode does not substitute mock collections on errors or empty results,
+and does not randomly move buses. Backend seed/simulator records and some
+analytical panels remain illustrative; this is not a validated live deployment.
+Road detections currently operate per frame. Hit-and-run rules require explicit
+collision and departure confirmations from the caller; the confidence value 0.0
+means uncalibrated, not a measured probability. No component supplying these
+confirmations is implemented by this change. Real-video validation remains needed.
