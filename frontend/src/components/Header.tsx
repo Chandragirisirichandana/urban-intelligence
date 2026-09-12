@@ -69,7 +69,6 @@ export const Header: React.FC<HeaderProps> = ({
             <h1 style={{ fontSize: '1.15rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
               URBAN INTELLIGENCE
             </h1>
-            <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>SIH 2024 EDITION</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

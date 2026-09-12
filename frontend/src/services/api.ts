@@ -3,7 +3,8 @@
  */
 import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem, SystemStats } from '../types';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
+export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 // Initial fallback mock data for Hyderabad city
 export const MOCK_BUSES: Bus[] = [
@@ -175,7 +176,7 @@ export const MOCK_ALERTS: Alert[] = [
 ];
 
 export const MOCK_ROAD_SEGMENTS: RoadSegment[] = [
-  { id: 1, segment_code: 'HYD-RD-01', road_name: 'Nampally Main Road', start_latitude: 17.4350, start_longitude: 78.4900, end_latitude: 17.4450, end_longitude: 17.5020, condition: 'poor', condition_score: 42.5, defect_count: 5, observation_count: 28, importance: 'high' },
+  { id: 1, segment_code: 'HYD-RD-01', road_name: 'Nampally Main Road', start_latitude: 17.4350, start_longitude: 78.4900, end_latitude: 17.4450, end_longitude: 78.5020, condition: 'poor', condition_score: 42.5, defect_count: 5, observation_count: 28, importance: 'high' },
   { id: 2, segment_code: 'HYD-RD-02', road_name: 'Begumpet Airport Arterial', start_latitude: 17.4500, start_longitude: 78.4050, end_latitude: 17.4650, end_longitude: 78.4200, condition: 'fair', condition_score: 68.0, defect_count: 2, observation_count: 45, importance: 'critical' },
   { id: 3, segment_code: 'HYD-RD-03', road_name: 'Charminar Transit Lane', start_latitude: 17.3580, start_longitude: 78.4720, end_latitude: 17.3880, end_longitude: 78.4800, condition: 'critical', condition_score: 28.0, defect_count: 9, observation_count: 52, importance: 'high' },
   { id: 4, segment_code: 'HYD-RD-04', road_name: 'Miyapur Express Corridor', start_latitude: 17.4800, start_longitude: 78.3600, end_latitude: 17.5050, end_longitude: 78.3850, condition: 'good', condition_score: 91.0, defect_count: 0, observation_count: 64, importance: 'normal' },
@@ -189,82 +190,43 @@ export const MOCK_MAINTENANCE: MaintenanceItem[] = [
   { id: 4, title: 'Repair Struck Road Divider at Begumpet', description: 'Central concrete divider cracked and shifted post-incident.', defect_type: 'damaged_divider', severity: 'high', priority_score: 82.0, observation_count: 5, latitude: 17.4580, longitude: 78.4100, status: 'in_progress', road_segment_id: 2 }
 ];
 
+async function getCollection<T>(path: string, demoData: T[]): Promise<T[]> {
+  if (DEMO_MODE) return demoData;
+  const response = await fetch(`${API_BASE}${path}`, { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) throw new Error(`API request failed (${response.status})`);
+  const data: unknown = await response.json();
+  if (!Array.isArray(data)) throw new Error('Unexpected API response');
+  return data as T[];
+}
+
+const BACKEND_SCENARIOS = [
+  { event_type: 'pothole', severity: 'high', confidence: 0.92, latitude: 17.4400, longitude: 78.4980, bus_id: 12, description: 'Deep road surface crater detected on Nampally Main Road' },
+  { event_type: 'pothole', severity: 'high', confidence: 0.95, latitude: 17.4402, longitude: 78.4981, bus_id: 7, description: 'Corroborating pothole sighting for spatial deduplication' },
+  { event_type: 'congestion', severity: 'high', confidence: 0.89, latitude: 17.4100, longitude: 78.4680, bus_id: 7, description: 'Traffic congestion bottleneck at Mehdipatnam Junction' },
+  { event_type: 'waterlogging', severity: 'critical', confidence: 0.95, latitude: 17.3850, longitude: 78.4750, bus_id: 8, description: 'Severe waterlogging covering the bus transit lane' },
+  { event_type: 'pedestrian_risk', severity: 'high', confidence: 0.91, latitude: 17.4500, longitude: 78.3800, bus_id: 4, description: 'Pedestrian crossing risk in Ameerpet School Zone' },
+  { event_type: 'hit_and_run', severity: 'critical', confidence: 0.93, latitude: 17.4580, longitude: 78.4100, bus_id: 11, description: 'Hit-and-run incident with vehicle departure near Begumpet' },
+];
+
 export const apiClient = {
-  async getBuses(): Promise<Bus[]> {
-    try {
-      const res = await fetch(`${API_BASE}/buses/`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_BUSES;
-  },
+  getBuses: () => getCollection('/buses/', MOCK_BUSES),
+  getRoutes: () => getCollection('/routes/', MOCK_ROUTES),
+  getEvents: () => getCollection('/events/', MOCK_EVENTS),
+  getAlerts: () => getCollection('/alerts/', MOCK_ALERTS),
+  getRoadSegments: () => getCollection('/roads/segments', MOCK_ROAD_SEGMENTS),
+  getMaintenanceQueue: () => getCollection('/roads/maintenance-queue', MOCK_MAINTENANCE),
+  async triggerDemoScenario(scenarioIndex: number) {
+    if (DEMO_MODE) return { status: 'simulated_locally', scenarioIndex };
 
-  async getRoutes(): Promise<Route[]> {
-    try {
-      const res = await fetch(`${API_BASE}/routes/`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_ROUTES;
-  },
-
-  async getEvents(): Promise<UrbanEvent[]> {
-    try {
-      const res = await fetch(`${API_BASE}/events/`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_EVENTS;
-  },
-
-  async getAlerts(): Promise<Alert[]> {
-    try {
-      const res = await fetch(`${API_BASE}/alerts/`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_ALERTS;
-  },
-
-  async getRoadSegments(): Promise<RoadSegment[]> {
-    try {
-      const res = await fetch(`${API_BASE}/roads/`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_ROAD_SEGMENTS;
-  },
-
-  async getMaintenanceQueue(): Promise<MaintenanceItem[]> {
-    try {
-      const res = await fetch(`${API_BASE}/roads/maintenance`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (_) {}
-    return MOCK_MAINTENANCE;
-  },
-
-  async triggerDemoScenario(scenarioIndex: number): Promise<any> {
-    try {
-      const res = await fetch(`${API_BASE}/events/demo-trigger`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario_index: scenarioIndex })
-      });
-      if (res.ok) return await res.json();
-    } catch (_) {}
-    return { status: 'simulated_locally', scenarioIndex };
+    const scenario = BACKEND_SCENARIOS[scenarioIndex];
+    if (!scenario) throw new Error('Unknown demo scenario');
+    const response = await fetch(`${API_BASE}/events/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...scenario, is_simulated: true }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) throw new Error(`Scenario request failed (${response.status})`);
+    return response.json();
   }
 };

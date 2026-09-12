@@ -16,17 +16,19 @@ import { RoutesView } from './views/RoutesView';
 import { ReportsView } from './views/ReportsView';
 import { MlOpsView } from './views/MlOpsView';
 
-import { apiClient, MOCK_BUSES, MOCK_ROUTES, MOCK_EVENTS, MOCK_ALERTS, MOCK_ROAD_SEGMENTS, MOCK_MAINTENANCE } from './services/api';
+import { apiClient, DEMO_MODE, MOCK_BUSES, MOCK_ROUTES, MOCK_EVENTS, MOCK_ALERTS, MOCK_ROAD_SEGMENTS, MOCK_MAINTENANCE } from './services/api';
 import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem } from './types';
 
 export const App: React.FC = () => {
+  const [loadError, setLoadError] = useState('');
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [buses, setBuses] = useState<Bus[]>(MOCK_BUSES);
-  const [routes, setRoutes] = useState<Route[]>(MOCK_ROUTES);
-  const [events, setEvents] = useState<UrbanEvent[]>(MOCK_EVENTS);
-  const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
-  const [roadSegments, setRoadSegments] = useState<RoadSegment[]>(MOCK_ROAD_SEGMENTS);
-  const [maintenanceQueue, setMaintenanceQueue] = useState<MaintenanceItem[]>(MOCK_MAINTENANCE);
+  const [buses, setBuses] = useState<Bus[]>(DEMO_MODE ? MOCK_BUSES : []);
+  const [routes, setRoutes] = useState<Route[]>(DEMO_MODE ? MOCK_ROUTES : []);
+  const [events, setEvents] = useState<UrbanEvent[]>(DEMO_MODE ? MOCK_EVENTS : []);
+  const [alerts, setAlerts] = useState<Alert[]>(DEMO_MODE ? MOCK_ALERTS : []);
+  const [roadSegments, setRoadSegments] = useState<RoadSegment[]>(DEMO_MODE ? MOCK_ROAD_SEGMENTS : []);
+  const [maintenanceQueue, setMaintenanceQueue] = useState<MaintenanceItem[]>(DEMO_MODE ? MOCK_MAINTENANCE : []);
 
   const [selectedEvent, setSelectedEvent] = useState<UrbanEvent | null>(null);
   const [reportEvent, setReportEvent] = useState<UrbanEvent | null>(null);
@@ -34,6 +36,7 @@ export const App: React.FC = () => {
   // Initial data fetch
   useEffect(() => {
     async function loadData() {
+      try {
       const [b, r, e, a, roads, maint] = await Promise.all([
         apiClient.getBuses(),
         apiClient.getRoutes(),
@@ -48,12 +51,17 @@ export const App: React.FC = () => {
       setAlerts(a);
       setRoadSegments(roads);
       setMaintenanceQueue(maint);
+      setLoadError('');
+      } catch {
+        setLoadError('Unable to load backend data. Check the connection and refresh to retry.');
+      } finally { setLoading(false); }
     }
     loadData();
   }, []);
 
   // Live simulation ticker: updates bus GPS coordinates smoothly along their routes
   useEffect(() => {
+    if (!DEMO_MODE) return;
     const interval = setInterval(() => {
       setBuses((prevBuses) =>
         prevBuses.map((bus) => {
@@ -76,8 +84,29 @@ export const App: React.FC = () => {
   }, []);
 
   // Trigger SIH Demonstration Scenario
-  const handleTriggerDemo = (scenarioIdx: number) => {
-    apiClient.triggerDemoScenario(scenarioIdx);
+  const handleTriggerDemo = async (scenarioIdx: number) => {
+    try {
+      await apiClient.triggerDemoScenario(scenarioIdx);
+      if (!DEMO_MODE) {
+        const [b, r, e, a, roads, maint] = await Promise.all([
+          apiClient.getBuses(),
+          apiClient.getRoutes(),
+          apiClient.getEvents(),
+          apiClient.getAlerts(),
+          apiClient.getRoadSegments(),
+          apiClient.getMaintenanceQueue()
+        ]);
+        setBuses(b);
+        setRoutes(r);
+        setEvents(e);
+        setAlerts(a);
+        setRoadSegments(roads);
+        setMaintenanceQueue(maint);
+      }
+      setLoadError('');
+    } catch {
+      setLoadError('Unable to trigger the scenario. Check the backend connection and retry.');
+    }
 
     // If scenario 1 (Spatial Deduplication): increment observation count of the Nampally pothole
     if (scenarioIdx === 1) {
@@ -107,6 +136,11 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
+      <div role="status" style={{ padding: '12px 20px', color: '#fff', background: '#283344' }}>
+        {DEMO_MODE ? 'DEMO MODE — simulated events, locations and metrics.' : 'BACKEND MODE — prototype; some analytical panels still contain illustrative metrics. Backend records may include simulation data.'}
+      </div>
+      {loading && <p role="status">Loading data…</p>}
+      {loadError && <p role="alert" style={{ color: '#ffb4b4', padding: '12px 20px' }}>{loadError}</p>}
       {/* Top Header */}
       <Header
         activeTab={activeTab}

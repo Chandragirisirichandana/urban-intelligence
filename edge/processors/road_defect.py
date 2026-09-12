@@ -190,5 +190,5 @@ class RoadDefectProcessor:
         return [
             f"Identified {name_clean} with {int(confidence * 100)}% model confidence",
             f"Assessed severity: {severity.upper()} based on road plane dimension ({area} m²)",
-            f"Edge vision filter verified across consecutive frame stability"
+            f"Single-frame detection; temporal confirmation has not been performed"
         ]

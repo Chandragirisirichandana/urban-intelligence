@@ -150,3 +150,29 @@ def test_spatial_temporal_deduplication():
     assert cluster2.observation_count == 2
     # Confidence reinforced above single sighting
     assert cluster2.aggregate_confidence > 0.90
+
+
+def test_near_miss_is_not_hit_and_run():
+    processor = IncidentProcessor()
+    for _ in range(5):
+        result = processor.analyze_trajectory(1, 'car', [0.2, 0.2, 0.4, 0.4], 50.0, near_collision=True)
+        assert result is None
+
+
+def test_hit_and_run_requires_both_confirmations():
+    for collision, departure in [(True, False), (False, True), (True, True)]:
+        processor = IncidentProcessor()
+        for _ in range(5):
+            result = processor.analyze_trajectory(
+                1, 'car', [0.2, 0.2, 0.4, 0.4], 30.0,
+                collision_confirmed=collision, departure_confirmed=departure)
+        if collision and departure:
+            assert result.incident_type == 'hit_and_run'
+            assert result.confidence == 0.0
+        else:
+            assert result is None
+
+
+def test_single_frame_explanation_does_not_claim_temporal_verification():
+    reasons = RoadDefectProcessor._generate_reasons('pothole', 0.8, 0.3, 'high')
+    assert any('temporal confirmation has not been performed' in reason for reason in reasons)
