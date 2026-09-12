@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en"><script src="chrome-extension://nimlmejbmnecnaghgmbahmbaddhjbecg/content/location/location.js" id="nimlmejbmnecnaghgmbahmbaddhjbecg"></script><script src="chrome-extension://nimlmejbmnecnaghgmbahmbaddhjbecg/libs/extend-native-history-api.js"></script><script src="chrome-extension://nimlmejbmnecnaghgmbahmbaddhjbecg/libs/requests.js"></script><head>
+    <script type="module">import { injectIntoGlobalHook } from "/@react-refresh";
+injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Intelligence — Smart City Sensing Platform</title>
+    <meta name="description" content="Turn public transport cameras into real-time insights for safer roads, better traffic flow, and faster incident review. AI-powered urban sensing for smart cities.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Urban Intelligence — Smart City Sensing Platform">
+    <meta property="og:description" content="Turn public transport cameras into real-time insights for safer roads, better traffic flow, and faster incident review.">
+
+    <!-- Preconnect to Google Fonts for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <style type="text/css" data-vite-dev-id="C:/Users/Sirichandana/OneDrive/Desktop/claude/urban-intelligence/frontend/src/index.css">
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* =============================================================================
+   URBAN INTELLIGENCE PLATFORM — DESIGN SYSTEM
+   Inspired by Framer's clean product aesthetic. Near-black surfaces, Inter+Geist
+   typography, electric blue accent, red/amber for severity only.
+   ============================================================================= */
+:root {
+  /* ── Surfaces ── */
+  --bg-root: #09090b;
+  --bg-primary: #09090b;
+  --bg-secondary: #111113;
+  --bg-card: #18181b;
+  --bg-card-hover: #1f1f23;
+  --bg-elevated: #27272a;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  /* ── Borders ── */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(37, 99, 235, 0.5);
+
+  /* ── Accent ── */
+  --accent: #2563eb;
+  --accent-hover: #3b82f6;
+  --accent-muted: rgba(37, 99, 235, 0.12);
+  --accent-text: #60a5fa;
+
+  /* ── Severity (reserved for alerts) ── */
+  --severity-critical: #dc2626;
+  --severity-critical-muted: rgba(220, 38, 38, 0.12);
+  --severity-high: #d97706;
+  --severity-high-muted: rgba(217, 119, 6, 0.12);
+  --severity-medium: #ca8a04;
+  --severity-medium-muted: rgba(202, 138, 4, 0.12);
+  --severity-low: #16a34a;
+  --severity-low-muted: rgba(22, 163, 74, 0.12);
+  --severity-info: #0891b2;
+  --severity-info-muted: rgba(8, 145, 178, 0.12);
+
+  /* ── Typography ── */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-inverse: #09090b;
+
+  /* ── Fonts ── */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  /* ── Spacing (reference) ── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* ── Transitions ── */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-root);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.heading-xl { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.heading-lg { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.025em; }
+.heading-md { font-size: 1.5rem; font-weight: 700; }
+.heading-sm { font-size: 1.125rem; font-weight: 600; }
+.heading-xs { font-size: 0.9375rem; font-weight: 600; }
+
+.text-lg { font-size: 1.125rem; line-height: 1.6; }
+.text-md { font-size: 0.9375rem; }
+.text-sm { font-size: 0.8125rem; }
+.text-xs { font-size: 0.75rem; }
+
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent-text); }
+
+.mono { font-family: var(--font-mono); }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ── Panels / Cards ── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-fast);
+}
+
+.panel:hover {
+  border-color: var(--border-default);
+}
+
+.panel-elevated {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.panel-inner {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.panel-accent {
+  background: var(--accent-muted);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.badge-critical {
+  background: var(--severity-critical-muted);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+.badge-critical::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--severity-critical);
+  flex-shrink: 0;
+}
+
+.badge-high {
+  background: var(--severity-high-muted);
+  color: #fbbf24;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.badge-medium {
+  background: var(--severity-medium-muted);
+  color: #fde047;
+  border: 1px solid rgba(202, 138, 4, 0.25);
+}
+
+.badge-low {
+  background: var(--severity-low-muted);
+  color: #4ade80;
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.badge-info {
+  background: var(--severity-info-muted);
+  color: #67e8f9;
+  border: 1px solid rgba(8, 145, 178, 0.25);
+}
+
+.badge-neutral {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.badge-accent {
+  background: var(--accent-muted);
+  color: var(--accent-text);
+  border: 1px solid var(--border-accent);
+}
+
+.badge-demo {
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* ── Buttons ── */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-height: 36px;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid transparent;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background: var(--severity-critical-muted);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #fca5a5;
+}
+.btn-danger:hover {
+  background: rgba(220, 38, 38, 0.2);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  min-height: 28px;
+  font-size: 0.75rem;
+}
+
+.btn-lg {
+  padding: 12px 24px;
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.btn-icon {
+  padding: 6px;
+  min-height: auto;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Status Indicators ── */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot-active {
+  background-color: var(--severity-low);
+  box-shadow: 0 0 6px var(--severity-low);
+}
+
+.status-dot-critical {
+  background-color: var(--severity-critical);
+  box-shadow: 0 0 6px var(--severity-critical);
+  animation: pulse-critical 2s infinite ease-in-out;
+}
+
+.status-dot-warn {
+  background-color: var(--severity-high);
+  box-shadow: 0 0 6px var(--severity-high);
+}
+
+.status-dot-offline {
+  background-color: var(--text-muted);
+}
+
+@keyframes pulse-critical {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Tables ── */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.data-table thead tr {
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-secondary);
+}
+
+.data-table th {
+  padding: 10px 16px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Forms ── */
+input[type="text"],
+input[type="search"],
+select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ── Progress Bar ── */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+/* ── Leaflet Dark Theme ── */
+.leaflet-container {
+  background-color: var(--bg-root) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card) !important;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s var(--transition-slow) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease forwards;
+}
+
+/* Staggered delays for lists */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* ── Accessibility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Utility ── */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.clickable-row:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+.clickable-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .heading-xl { font-size: 2.25rem; }
+  .heading-lg { font-size: 1.75rem; }
+  .heading-md { font-size: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .heading-xl { font-size: 1.75rem; }
+  .heading-lg { font-size: 1.5rem; }
+}
+
+/* ── Landing Page Styles ── */
+.landing-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(9, 9, 11, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--transition-base);
+}
+
+.landing-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Print ── */
+@media print {
+  body { background: #fff; color: #000; }
+  .panel, .panel-elevated { background: #fff; border: 1px solid #ddd; }
+  .badge { border: 1px solid #999; }
+  .landing-nav, .sidebar, .mobile-drawer-overlay { display: none !important; }
+}
+</style><style type="text/css" data-vite-dev-id="C:/Users/Sirichandana/OneDrive/Desktop/claude/urban-intelligence/frontend/node_modules/leaflet/dist/leaflet.css">/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(/node_modules/leaflet/dist/images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(/node_modules/leaflet/dist/images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(/node_modules/leaflet/dist/images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+</style></head>
+  <body __processed_110529e1-86f1-464c-9e73-9f26abdce8a2__="true">
+    <div id="root"><div style="min-height: 100vh; background: var(--bg-root); color: var(--text-primary); overflow-x: hidden;"><header class="landing-nav"><div style="display: flex; align-items: center; gap: 12px;"><div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, rgb(37, 99, 235) 0%, rgb(29, 78, 216) 100%); display: flex; align-items: center; justify-content: center; box-shadow: rgba(37, 99, 235, 0.4) 0px 0px 16px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div><div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;">Urban Intelligence</span><span class="badge badge-accent" style="font-size: 0.68rem; padding: 2px 6px;">SIH26124</span></div></div><nav class="hide-mobile" style="display: flex; align-items: center; gap: 28px;"><a href="#capabilities" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s;">Capabilities</a><a href="#pipeline" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s;">How It Works</a><a href="#architecture" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s;">Architecture</a><a href="#impact" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s;">Impact</a></nav><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary hide-mobile" style="font-size: 0.8125rem;">Live Demo</button><button class="btn btn-primary" style="font-size: 0.8125rem; gap: 6px;"><span>Open Dashboard</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></button></div></header><section style="padding-top: 130px; padding-bottom: 80px; position: relative;"><div style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 680px; height: 340px; background: radial-gradient(rgba(37, 99, 235, 0.15) 0%, rgba(9, 9, 11, 0) 70%); pointer-events: none; z-index: 0;"></div><div class="landing-section" style="position: relative; z-index: 1; text-align: center;"><div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); margin-bottom: 24px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: rgb(34, 197, 94); box-shadow: rgb(34, 197, 94) 0px 0px 8px;"></span><span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-secondary);">SMART TRANSIT EDGE SENSING PLATFORM</span></div><h1 class="heading-xl" style="max-width: 920px; margin: 0px auto 20px; letter-spacing: -0.035em; line-height: 1.08;">Every bus. <span style="color: var(--text-secondary);">A continuous</span> smart city sensor.</h1><p style="max-width: 680px; margin: 0px auto 36px; font-size: 1.125rem; line-height: 1.6; color: var(--text-secondary); font-weight: 400;">Transform existing public bus fleets into an autonomous urban monitoring network. Detect road craters, traffic congestion, pedestrian risks, and hit-and-runs in real-time with edge AI inference.</p><div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 48px;"><button class="btn btn-primary" style="padding: 12px 24px; font-size: 0.9375rem; border-radius: 10px; box-shadow: rgba(37, 99, 235, 0.35) 0px 4px 20px;"><span>Launch Command Center</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></button><button class="btn btn-secondary" style="padding: 12px 20px; font-size: 0.9375rem; border-radius: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Explore Interactive Demo</span></button></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; max-width: 840px; margin: 0px auto;"><div class="panel" style="padding: 14px 16px; text-align: left;"><div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Bus Fleet Monitored</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">10 Active Buses</div><div style="font-size: 0.6875rem; color: var(--text-secondary); margin-top: 2px;">Hyderabad Transit Corridor</div></div><div class="panel" style="padding: 14px 16px; text-align: left;"><div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Edge Video AI</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">22.0 FPS</div><div style="font-size: 0.6875rem; color: var(--text-secondary); margin-top: 2px;">Real-time Onboard YOLOv8</div></div><div class="panel" style="padding: 14px 16px; text-align: left;"><div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Bandwidth Saved</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">98.4%</div><div style="font-size: 0.6875rem; color: var(--text-secondary); margin-top: 2px;">Metadata transmission only</div></div><div class="panel" style="padding: 14px 16px; text-align: left;"><div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Spatial Accuracy</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">&lt; 2.5m GPS</div><div style="font-size: 0.6875rem; color: var(--text-secondary); margin-top: 2px;">Multi-bus deduplication</div></div></div></div></section><section style="padding: 40px 0px 80px;"><div class="landing-section"><div class="panel-elevated" style="padding: 24px; border-radius: 16px; border: 1px solid var(--border-default); box-shadow: rgba(0, 0, 0, 0.6) 0px 24px 60px;"><div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;"><div style="display: flex; align-items: center; gap: 10px;"><div style="display: flex; gap: 6px;"><div style="width: 10px; height: 10px; border-radius: 50%; background: rgb(239, 68, 68);"></div><div style="width: 10px; height: 10px; border-radius: 50%; background: rgb(245, 158, 11);"></div><div style="width: 10px; height: 10px; border-radius: 50%; background: rgb(34, 197, 94);"></div></div><span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-secondary); margin-left: 6px;">Urban Intelligence Platform — Live Telemetry Preview</span><span class="badge badge-accent" style="font-size: 0.65rem;">SIMULATION READY</span></div><div style="display: flex; background: rgba(255, 255, 255, 0.04); padding: 3px; border-radius: 8px; border: 1px solid var(--border-subtle);"><button style="background: var(--accent); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.15s;">GIS Map</button><button style="background: transparent; color: var(--text-secondary); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.15s;">Road Quality</button><button style="background: transparent; color: var(--text-secondary); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.15s;">Congestion</button><button style="background: transparent; color: var(--text-secondary); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.15s;">ANPR &amp; Incident</button></div></div><div class="preview-grid" style="display: grid; grid-template-columns: 1fr 340px; gap: 18px; min-height: 380px;"><div style="background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-subtle); padding: 20px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;"><div style="position: absolute; inset: 0px; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none;"></div><div style="position: relative; z-index: 1;"><div style="display: flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-size: 0.75rem; color: var(--text-muted);">ACTIVE SECTOR</div><div style="font-size: 1.125rem; font-weight: 700;">Hyderabad Metropolitan Transit Corridor</div><div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Secunderabad ↔ Charminar ↔ Miyapur Express</div></div><span class="badge badge-low" style="display: flex; align-items: center; gap: 6px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: rgb(34, 197, 94);"></span>All Nodes Streaming</span></div><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px;"><div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"><div style="font-size: 0.6875rem; color: var(--text-muted);">Potholes Flagged</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--severity-high);">14 Detected</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">Spatial cluster #C104</div></div><div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"><div style="font-size: 0.6875rem; color: var(--text-muted);">Corridor Flow</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--accent-text);">29.2 km/h</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">Mehdipatnam Slowdown</div></div><div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"><div style="font-size: 0.6875rem; color: var(--text-muted);">Active Alerts</div><div style="font-size: 1.25rem; font-weight: 700; color: var(--severity-critical);">2 Critical</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">Hit-and-Run + Flood</div></div></div></div><div style="position: relative; z-index: 1; padding: 24px 0px; display: flex; justify-content: space-around; align-items: center;"><div style="background: var(--bg-card); border: 1px solid var(--border-default); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></div><div><div style="font-size: 0.75rem; font-weight: 600;">TS09-3201</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">R1 • 38.5 km/h</div></div></div><div style="background: var(--bg-card); border: 1px solid var(--border-default); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></div><div><div style="font-size: 0.75rem; font-weight: 600;">TS09-3202</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">R1 • 29.2 km/h</div></div></div><div style="background: var(--bg-card); border: 1px solid var(--border-default); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></div><div><div style="font-size: 0.75rem; font-weight: 600;">TS09-3203</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">R2 • 44.0 km/h</div></div></div><div style="background: var(--bg-card); border: 1px solid var(--border-default); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></div><div><div style="font-size: 0.75rem; font-weight: 600;">TS09-3212</div><div style="font-size: 0.6875rem; color: var(--text-secondary);">R1 • 31.0 km/h</div></div></div></div><div style="position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 12px;"><span style="font-size: 0.75rem; color: var(--text-muted);">Visual reference representation • Real Leaflet GIS loaded in command center</span><button style="background: transparent; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; color: var(--accent-text); font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">Open Live Interactive GIS Map →</button></div></div><div style="background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-subtle); padding: 16px; display: flex; flex-direction: column;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;"><span style="font-size: 0.8125rem; font-weight: 700;">Real-Time Events</span><span class="badge badge-critical" style="font-size: 0.625rem;">LIVE INGESTION</span></div><div style="display: flex; flex-direction: column; gap: 10px; flex: 1 1 0%; overflow-y: auto;"><div style="padding: 10px 12px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); font-size: 0.75rem;"><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-weight: 600; color: var(--text-primary);">Pothole Crater Flagged</span><span style="color: var(--text-muted); font-size: 0.6875rem;">12m ago</span></div><div style="color: var(--text-secondary); margin-bottom: 6px;">Nampally Main Road</div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.6875rem; color: var(--text-muted);">Bus TS09-3212</span><span class="badge badge-high" style="font-size: 0.625rem; padding: 1px 6px;">Road Defect</span></div></div><div style="padding: 10px 12px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); font-size: 0.75rem;"><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-weight: 600; color: var(--text-primary);">Congestion Bottleneck</span><span style="color: var(--text-muted); font-size: 0.6875rem;">8m ago</span></div><div style="color: var(--text-secondary); margin-bottom: 6px;">Mehdipatnam Junction</div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.6875rem; color: var(--text-muted);">Bus TS09-3207</span><span class="badge badge-high" style="font-size: 0.625rem; padding: 1px 6px;">Traffic Flow</span></div></div><div style="padding: 10px 12px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); font-size: 0.75rem;"><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-weight: 600; color: var(--text-primary);">Pedestrians Crossing</span><span style="color: var(--text-muted); font-size: 0.6875rem;">15m ago</span></div><div style="color: var(--text-secondary); margin-bottom: 6px;">Ameerpet School Zone</div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.6875rem; color: var(--text-muted);">Bus TS09-3204</span><span class="badge badge-high" style="font-size: 0.625rem; padding: 1px 6px;">Safety Risk</span></div></div><div style="padding: 10px 12px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); font-size: 0.75rem;"><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span style="font-weight: 600; color: var(--severity-critical);">Hit-and-Run Incident</span><span style="color: var(--text-muted); font-size: 0.6875rem;">4m ago</span></div><div style="color: var(--text-secondary); margin-bottom: 6px;">Begumpet Arterial</div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.6875rem; color: var(--text-muted);">Bus TS09-3211</span><span class="badge badge-critical" style="font-size: 0.625rem; padding: 1px 6px;">ANPR Flagged</span></div></div></div><button class="btn btn-secondary" style="margin-top: 12px; width: 100%; font-size: 0.75rem; justify-content: center;">View All Events &amp; Evidence</button></div></div></div></div></section><section id="capabilities" style="padding: 80px 0px; border-top: 1px solid var(--border-subtle);"><div class="landing-section"><div style="text-align: center; margin-bottom: 48px;"><span class="badge badge-accent" style="margin-bottom: 12px;">CORE PLATFORM CAPABILITIES</span><h2 class="heading-lg" style="margin-top: 8px;">Intelligent City Sensing Across 6 Dimensions</h2><p style="color: var(--text-secondary); max-width: 600px; margin: 12px auto 0px; font-size: 0.9375rem;">Built for Municipal Corporations (GHMC), Transit Authorities (TSRTC), and Traffic Police Command Centers.</p></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;"><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Infrastructure</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Road Surface &amp; Defect Intelligence</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Autonomous detection of potholes, surface cracks, damaged dividers, and waterlogging. Evaluates road condition index (0–100) and deduplicates repeat observations across multiple buses.</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Mobility</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Dynamic Traffic &amp; Congestion Flow</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Monitors transit bottleneck choke points, vehicle density, and average transit speed vs design speed. Identifies queue build-up before city grids experience total gridlock.</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Safety</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Pedestrian &amp; Vulnerable User Safety</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Real-time detection of high-risk pedestrian crossing groups, jaywalking hotspots, missing zebra crossings, and school zone proximity geofencing with time-to-collision alerts.</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 15h10M7 9h2"></path></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Law Enforcement</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Incident Review &amp; ANPR Extraction</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Automated hit-and-run detection, rash driving, and wrong-way movement tagging. Captures vehicle registration plates validated against Telangana HSRP syntax (e.g. TS09AB1234).</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Municipal Works</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Predictive Maintenance Work Queue</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Prioritizes municipal repair dispatch orders using multi-bus cluster confirmation, road importance tiering, and severity impact scoring to deploy asphalt teams efficiently.</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div><div class="panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform var(--transition-base), border-color var(--transition-base); cursor: pointer;"><div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><div style="width: 42px; height: 42px; border-radius: 8px; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line></svg></div><span class="badge badge-neutral" style="font-size: 0.6875rem;">Architecture</span></div><h3 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em;">Edge-to-Cloud MLOps Pipeline</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Runs lightweight YOLOv8s models on onboard edge compute units. Transmits structured JSON metadata and cropped evidence only, preserving 98.4% cellular bandwidth.</p></div><div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; color: var(--accent-text); font-size: 0.75rem; font-weight: 600;"><span>View in Dashboard</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></div></div></div></div></section><section id="pipeline" style="padding: 80px 0px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);"><div class="landing-section"><div style="text-align: center; margin-bottom: 52px;"><span class="badge badge-accent" style="margin-bottom: 12px;">END-TO-END WORKFLOW</span><h2 class="heading-lg" style="margin-top: 8px;">From Bus Camera to Municipal Action</h2><p style="color: var(--text-secondary); max-width: 580px; margin: 12px auto 0px; font-size: 0.9375rem;">How raw optical feeds are transformed into prioritized, actionable municipal dispatches in seconds.</p></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;"><div class="panel" style="padding: 20px 18px; position: relative;"><div style="font-size: 1.75rem; font-weight: 900; color: var(--accent); opacity: 0.8; letter-spacing: -0.04em; margin-bottom: 10px; font-family: var(--font-display);">01</div><h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 8px;">Capture</h4><p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.55;">Onboard 1080p cameras continuously scan roadway, traffic lane, and pedestrian crossways during regular transit routes.</p></div><div class="panel" style="padding: 20px 18px; position: relative;"><div style="font-size: 1.75rem; font-weight: 900; color: var(--accent); opacity: 0.8; letter-spacing: -0.04em; margin-bottom: 10px; font-family: var(--font-display);">02</div><h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 8px;">Edge Analyze</h4><p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.55;">Local edge units execute YOLOv8s computer vision at 22 FPS to detect defects, anomalies, and safety violations.</p></div><div class="panel" style="padding: 20px 18px; position: relative;"><div style="font-size: 1.75rem; font-weight: 900; color: var(--accent); opacity: 0.8; letter-spacing: -0.04em; margin-bottom: 10px; font-family: var(--font-display);">03</div><h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 8px;">Geotag &amp; Deduplicate</h4><p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.55;">Events are GPS tagged and spatially clustered. Multi-bus sightings increment confidence and filter false positives.</p></div><div class="panel" style="padding: 20px 18px; position: relative;"><div style="font-size: 1.75rem; font-weight: 900; color: var(--accent); opacity: 0.8; letter-spacing: -0.04em; margin-bottom: 10px; font-family: var(--font-display);">04</div><h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 8px;">Prioritize &amp; Alert</h4><p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.55;">Rule engine generates severity-ranked alerts (Critical, High, Medium) with time-to-collision and visual crop evidence.</p></div><div class="panel" style="padding: 20px 18px; position: relative;"><div style="font-size: 1.75rem; font-weight: 900; color: var(--accent); opacity: 0.8; letter-spacing: -0.04em; margin-bottom: 10px; font-family: var(--font-display);">05</div><h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 8px;">Municipal Action</h4><p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.55;">Integrated dashboard dispatches repair tasks to GHMC engineering divisions and traffic incident reports to police.</p></div></div></div></section><section id="architecture" style="padding: 80px 0px;"><div class="landing-section"><div class="responsive-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center;"><div><span class="badge badge-accent" style="margin-bottom: 14px;">ENGINEERED FOR SCALE</span><h2 class="heading-lg" style="margin-top: 8px; margin-bottom: 16px;">Edge-First Computing.<br>Zero Bandwidth Saturation.</h2><p style="color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.6; margin-bottom: 24px;">Traditional smart city solutions require streaming thousands of gigabytes of raw video over 4G/5G networks, creating prohibitive cellular costs. Urban Intelligence executes inference directly on the bus, transmitting only lightweight metadata packets.</p><div style="display: flex; flex-direction: column; gap: 14px;"><div style="display: flex; gap: 12px;"><div style="width: 20px; height: 20px; border-radius: 50%; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div><div style="font-size: 0.875rem; font-weight: 600;">98.4% Cellular Bandwidth Reduction</div><div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Video stays on the edge. Only JSON telemetry and small cropped evidence bounding boxes leave the vehicle.</div></div></div><div style="display: flex; gap: 12px;"><div style="width: 20px; height: 20px; border-radius: 50%; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div><div style="font-size: 0.875rem; font-weight: 600;">Spatial Deduplication Algorithm</div><div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Clusters sightings within 15-meter geofences across multiple bus trips to eliminate duplicate municipal tickets.</div></div></div><div style="display: flex; gap: 12px;"><div style="width: 20px; height: 20px; border-radius: 50%; background: var(--accent-muted); color: var(--accent-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div><div style="font-size: 0.875rem; font-weight: 600;">Offline Resilient Telemetry Queue</div><div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Local SQLite cache guarantees zero telemetry loss during tunnel transit or temporary cellular blind spots.</div></div></div></div></div><div class="panel" style="padding: 24px; background: var(--bg-card);"><div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 600;">STACK &amp; HARDWARE PROFILE (SIH26124)</div><div style="display: flex; flex-direction: column; gap: 12px;"><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Edge Vision Models</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">YOLOv8s + TensorRT Optimized</span></div><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Frontend Interface</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">React 18 + TypeScript + Vite + Leaflet</span></div><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Backend API Service</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">FastAPI + Pydantic + Uvicorn Async</span></div><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Plate Recognition</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">OCR + Telangana HSRP Validator</span></div><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom: 1px solid var(--border-subtle); font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Coordinate System</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">WGS84 EPSG:4326 GIS Mapping</span></div><div style="display: flex; justify-content: space-between; padding: 8px 0px; border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; font-size: 0.8125rem;"><span style="color: var(--text-secondary);">Demo Telemetry Engine</span><span style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono);">Active Simulated Fleet Ingestor</span></div></div></div></div></div></section><section id="impact" style="padding: 80px 0px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle);"><div class="landing-section"><div style="text-align: center; margin-bottom: 48px;"><span class="badge badge-accent" style="margin-bottom: 12px;">CITYWIDE VALUE</span><h2 class="heading-lg" style="margin-top: 8px;">Who Benefits from Urban Intelligence?</h2></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;"><div class="panel" style="padding: 24px;"><div style="font-size: 0.75rem; color: var(--accent-text); font-weight: 600; margin-bottom: 8px;">MUNICIPAL CORPORATIONS (GHMC)</div><h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 10px;">Road Infrastructure Division</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Replace slow manual inspection surveys with continuous daily road surface assessments. Reduce repair lead times from months to 48 hours with geo-verified crater coordinates.</p></div><div class="panel" style="padding: 24px;"><div style="font-size: 0.75rem; color: var(--accent-text); font-weight: 600; margin-bottom: 8px;">TRANSIT AUTHORITIES (TSRTC)</div><h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 10px;">Fleet &amp; Schedule Operations</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Identify corridor congestion bottlenecks and optimize timetable scheduling. Monitor bus fleet hardware health, latency, and camera operational uptime in real-time.</p></div><div class="panel" style="padding: 24px;"><div style="font-size: 0.75rem; color: var(--accent-text); font-weight: 600; margin-bottom: 8px;">TRAFFIC POLICE COMMAND</div><h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 10px;">Incident &amp; Safety Enforcement</h3><p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;">Receive instant hit-and-run and divider collision alerts with vehicle registration details (ANPR) and evidence crops, enabling rapid intercept responses.</p></div></div></div></section><section style="padding: 100px 0px; position: relative; text-align: center;"><div class="landing-section"><div class="panel-elevated" style="padding: 60px 32px; border-radius: 20px; border: 1px solid var(--border-default); background: linear-gradient(rgba(37, 99, 235, 0.08) 0%, rgb(24, 24, 27) 100%);"><h2 class="heading-lg" style="margin-bottom: 16px;">Ready to explore the Urban Intelligence platform?</h2><p style="color: var(--text-secondary); max-width: 540px; margin: 0px auto 32px; font-size: 1rem; line-height: 1.6;">Experience the full interactive command center with active Hyderabad fleet telemetry, GIS mapping, incident workflows, and AI diagnostics.</p><button class="btn btn-primary" style="padding: 14px 32px; font-size: 1rem; border-radius: 10px; box-shadow: rgba(37, 99, 235, 0.4) 0px 4px 24px;"><span>Launch Command Center</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></button></div></div></section><footer style="padding: 32px 0px; border-top: 1px solid var(--border-subtle); background: var(--bg-root);"><div class="landing-section" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;"><div style="display: flex; align-items: center; gap: 10px;"><div style="width: 22px; height: 22px; border-radius: 6px; background: var(--accent); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div><span style="font-size: 0.8125rem; font-weight: 600;">Urban Intelligence Platform</span><span style="font-size: 0.75rem; color: var(--text-muted);">• SIH26124 Smart City Sensing</span></div><div style="font-size: 0.75rem; color: var(--text-muted);">Designed for Municipal Transit Corridors • Hyderabad Pilot Telemetry</div></div></footer></div></div>
+    <script type="module" src="/src/main.tsx?t=1789231593881"></script>
+  
+
+</body></html>

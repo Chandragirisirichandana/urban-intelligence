@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UrbanEvent } from '../types';
-import { FileText, Printer, Download, CheckCircle, ShieldAlert, Sparkles, MapPin, Bus } from 'lucide-react';
+import { Printer, Sparkles } from 'lucide-react';
 
 interface ReportsViewProps {
   events: UrbanEvent[];
@@ -9,32 +9,35 @@ interface ReportsViewProps {
 
 export const ReportsView: React.FC<ReportsViewProps> = ({ events, initialSelectedEvent }) => {
   const [selectedEvent, setSelectedEvent] = useState<UrbanEvent>(
-    initialSelectedEvent || events[0] || {} as UrbanEvent
+    initialSelectedEvent || events[0] || ({} as UrbanEvent)
   );
 
   const handlePrint = () => {
     window.print();
   };
 
+  const hasPlate = !!selectedEvent.extra_metadata?.plate_number;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', color: '#fff' }}>OFFICIAL MUNICIPAL INCIDENT & DEFECT REPORTS</h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Certified inspection documentation generated directly from edge AI video evidence & GPS records
+          <h2 className="heading-md" style={{ marginBottom: '4px' }}>Official Municipal Incident & Defect Reports</h2>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            Certified inspection documentation generated from edge vision evidence and GPS coordinates.
           </p>
         </div>
 
-        <button onClick={handlePrint} className="btn-primary" style={{ fontSize: '0.82rem' }}>
-          <Printer size={15} /> Print / Export Formal PDF
+        <button onClick={handlePrint} className="btn btn-primary" style={{ fontSize: '0.8125rem', gap: '6px' }}>
+          <Printer size={15} />
+          <span>Print / Export PDF Dossier</span>
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '16px' }} className="responsive-2col">
         {/* Left: Incident Selector */}
-        <div className="glass-panel" style={{ padding: '14px', maxHeight: '700px', overflowY: 'auto' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '10px', textTransform: 'uppercase' }}>
+        <div className="panel" style={{ padding: '16px', maxHeight: '720px', overflowY: 'auto' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Select Incident or Hazard
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -44,23 +47,24 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ events, initialSelecte
                 <div
                   key={evt.id}
                   onClick={() => setSelectedEvent(evt)}
+                  className="clickable-row"
                   style={{
-                    padding: '10px',
-                    borderRadius: '8px',
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
-                    background: isSelected ? 'rgba(0, 242, 254, 0.12)' : 'rgba(0,0,0,0.2)',
-                    border: isSelected ? '1px solid var(--brand-cyan)' : '1px solid var(--border-subtle)'
+                    background: isSelected ? 'var(--accent-muted)' : 'rgba(255, 255, 255, 0.02)',
+                    border: isSelected ? '1px solid var(--border-accent)' : '1px solid var(--border-subtle)',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.78rem', color: isSelected ? '#fff' : 'var(--text-primary)' }}>
-                      {evt.event_type.replace(/_/g, ' ').toUpperCase()}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.8125rem', color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)', textTransform: 'capitalize' }}>
+                      {evt.event_type.replace(/_/g, ' ')}
                     </span>
-                    <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--brand-cyan)' }}>
+                    <span className="mono" style={{ fontSize: '0.6875rem', color: 'var(--accent-text)' }}>
                       {Math.round(evt.confidence * 100)}%
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     {evt.event_id} • Bus #{evt.bus_id}
                   </div>
                 </div>
@@ -70,80 +74,81 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ events, initialSelecte
         </div>
 
         {/* Right: Printable Formal Incident Dossier */}
-        <div className="glass-panel" style={{ padding: '28px', background: '#0b1120', border: '1px solid var(--border-medium)' }}>
+        <div className="panel" style={{ padding: '32px', background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
           {/* Official Letterhead */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid rgba(255,255,255,0.15)', paddingBottom: '16px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '16px', marginBottom: '20px' }}>
             <div>
-              <div style={{ fontSize: '0.75rem', letterSpacing: '0.1em', fontWeight: 700, color: 'var(--brand-cyan)', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.72rem', letterSpacing: '0.06em', fontWeight: 600, color: 'var(--accent-text)', textTransform: 'uppercase' }}>
                 GOVERNMENT OF TELANGANA • GREATER HYDERABAD MUNICIPAL CORPORATION
               </div>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', marginTop: '4px' }}>
-                MOBILE URBAN SENSING INCIDENT DOSSIER
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px', letterSpacing: '-0.02em' }}>
+                Mobile Urban Sensing Incident Dossier
               </h1>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                Command & Control Automated Edge Verification System
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                Command & Control Automated Edge Verification System (SIH26124)
               </div>
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <div className="mono" style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
+              <div className="mono" style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {selectedEvent.event_id || 'EVT_HYD_DOC_01'}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Generated: {new Date().toLocaleDateString('en-IN')}
+                Date: {new Date().toLocaleDateString('en-IN')}
               </div>
             </div>
           </div>
 
           {/* Dossier Body Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>INCIDENT CLASSIFICATION</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '4px' }}>INCIDENT CLASSIFICATION</div>
+              <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
                 {selectedEvent.event_type?.replace(/_/g, ' ')}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--status-critical)', marginTop: '4px' }}>
-                Severity Assessment: {selectedEvent.severity?.toUpperCase()}
+              <div style={{ fontSize: '0.75rem', color: 'var(--severity-critical)', marginTop: '4px' }}>
+                Severity: {selectedEvent.severity?.toUpperCase()}
               </div>
             </div>
 
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>GEOSPATIAL LOCATION</div>
-              <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '4px' }}>GEOSPATIAL COORDINATES</div>
+              <div className="mono" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {selectedEvent.latitude?.toFixed(5)}° N, {selectedEvent.longitude?.toFixed(5)}° E
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                Hyderabad Urban Corridor Core
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                Hyderabad Central Transit Sector
               </div>
             </div>
 
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>OBSERVING ASSET</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
-                Bus Node #{selectedEvent.bus_id} (CAM_FRONT)
+            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '4px' }}>OBSERVING SENSING UNIT</div>
+              <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Bus #{selectedEvent.bus_id} (CAM_FRONT)
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--brand-cyan)', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--accent-text)', marginTop: '4px' }}>
                 Edge Confidence: {Math.round((selectedEvent.confidence || 0.9) * 100)}%
               </div>
             </div>
 
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>ANPR IDENTIFICATION</div>
-              <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '4px' }}>ANPR IDENTIFICATION</div>
+              <div className="mono" style={{ fontSize: '0.9375rem', fontWeight: 700, color: hasPlate ? 'var(--text-primary)' : 'var(--text-muted)' }}>
                 {selectedEvent.extra_metadata?.plate_number || 'NO OFFENDER PLATE ASSOCIATED'}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--status-low)', marginTop: '4px' }}>
-                Format Status: VALID TELANGANA SYNTAX
+              <div style={{ fontSize: '0.75rem', color: hasPlate ? '#22c55e' : 'var(--text-muted)', marginTop: '4px' }}>
+                {hasPlate ? 'Format: VALID TELANGANA SYNTAX' : 'Telemetry incident without plate trigger'}
               </div>
             </div>
           </div>
 
           {/* AI Explainability Statement */}
-          <div style={{ background: 'rgba(0, 242, 254, 0.04)', border: '1px solid rgba(0, 242, 254, 0.25)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '0.85rem', color: 'var(--brand-cyan)', marginBottom: '8px' }}>
-              <Sparkles size={16} /> AUTOMATED AI REASONING & EVIDENCE CHAIN OF CUSTODY
+          <div style={{ background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '0.8125rem', color: 'var(--accent-text)', marginBottom: '8px' }}>
+              <Sparkles size={16} />
+              <span>Automated AI Reasoning & Chain of Custody</span>
             </div>
-            <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
               {selectedEvent.ai_reasoning?.map((r, i) => (
                 <div key={i} style={{ marginBottom: '4px' }}>• {r}</div>
               )) || (
@@ -152,15 +157,21 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ events, initialSelecte
             </div>
           </div>
 
+          {/* Description */}
+          <div style={{ marginBottom: '24px', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            <b style={{ color: 'var(--text-primary)' }}>Narrative Summary: </b>
+            {selectedEvent.description}
+          </div>
+
           {/* Official Sign-off Block */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)', fontSize: '0.75rem', color: 'var(--text-muted)', flexWrap: 'wrap', gap: '12px' }}>
             <div>
-              <div>Generated by: <b>Autonomous Edge Sensing System</b></div>
-              <div>Privacy Policy: Data Sanitization & Facial Blurring Applied</div>
+              <div>Generated by: <b style={{ color: 'var(--text-primary)' }}>Autonomous Edge Sensing System</b></div>
+              <div>Privacy Policy: Edge Sanitization & Facial Blurring Guaranteed</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ borderBottom: '1px solid var(--text-muted)', width: '160px', height: '24px', marginBottom: '4px' }} />
-              <div>Authorized Command Officer Signature</div>
+              <div>Authorized Command Officer</div>
             </div>
           </div>
         </div>
@@ -168,3 +179,4 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ events, initialSelecte
     </div>
   );
 };
+export default ReportsView;

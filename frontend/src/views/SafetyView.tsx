@@ -1,6 +1,6 @@
 import React from 'react';
 import { UrbanEvent } from '../types';
-import { Users, AlertTriangle, ShieldCheck, MapPin, Clock } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface SafetyViewProps {
   events: UrbanEvent[];
@@ -11,54 +11,58 @@ export const SafetyView: React.FC<SafetyViewProps> = ({ events, onSelectEvent })
   const safetyEvents = events.filter(e => e.event_type === 'pedestrian_risk');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <div>
-        <h2 style={{ fontSize: '1.25rem', color: '#fff' }}>VULNERABLE ROAD USER & PEDESTRIAN SAFETY</h2>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-          Real-time hazard detection for pedestrians, school zones, unprotected crossing groups, and collision risk
+        <h2 className="heading-md" style={{ marginBottom: '4px' }}>Vulnerable Road User & Pedestrian Safety</h2>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+          Real-time detection for pedestrians in transit corridors, school zone geofencing, and proximity collision alerts.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '16px' }} className="responsive-2col">
         {/* Left Column: Active Pedestrian Risk Events */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <h3 style={{ fontSize: '0.95rem', color: '#fff', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle size={16} color="var(--status-high)" /> DETECTED PEDESTRIAN HAZARDS
-          </h3>
+        <div className="panel" style={{ padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={16} color="var(--severity-high)" />
+              <span>Detected Pedestrian Hazards</span>
+            </h3>
+            <span className="badge badge-high" style={{ fontSize: '0.65rem' }}>{safetyEvents.length} Active</span>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {safetyEvents.map((evt) => (
               <div
                 key={evt.id}
                 onClick={() => onSelectEvent(evt)}
+                className="clickable-row"
                 style={{
-                  padding: '14px',
-                  borderRadius: '10px',
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
-                  cursor: 'pointer'
+                  padding: '16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid var(--border-subtle)',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span className="badge badge-high">Ameerpet School Zone</span>
-                  <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--brand-cyan)', fontWeight: 700 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span className="badge badge-high" style={{ fontSize: '0.6875rem' }}>Ameerpet School Zone</span>
+                  <span className="mono" style={{ fontSize: '0.8125rem', color: 'var(--accent-text)', fontWeight: 600 }}>
                     {Math.round(evt.confidence * 100)}% Confidence
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginBottom: '6px' }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>
                   {evt.description}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  <div>Pedestrian Cluster: <b style={{ color: '#fff' }}>4 Persons</b></div>
-                  <div>Estimated Proximity: <b style={{ color: 'var(--status-critical)' }}>7.5 meters</b></div>
-                  <div>Time-to-Collision: <b style={{ color: 'var(--status-critical)' }}>2.1 sec</b></div>
-                  <div>Crosswalk Status: <b style={{ color: 'var(--status-high)' }}>Unmarked Crossing</b></div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                  <div>Pedestrian Cluster: <b style={{ color: 'var(--text-primary)' }}>4 Persons</b></div>
+                  <div>Estimated Proximity: <b style={{ color: 'var(--severity-critical)' }}>7.5 meters</b></div>
+                  <div>Time-to-Collision: <b style={{ color: 'var(--severity-critical)' }}>2.1 sec</b></div>
+                  <div>Crosswalk Status: <b style={{ color: 'var(--severity-high)' }}>Unmarked Crossing</b></div>
                 </div>
 
-                <div style={{ fontSize: '0.72rem', color: 'var(--brand-cyan)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  Click to inspect full AI explainability reasoning & evidence frame →
+                <div style={{ fontSize: '0.75rem', color: 'var(--accent-text)', fontWeight: 500 }}>
+                  Click to inspect full AI explainability reasoning & visual frame →
                 </div>
               </div>
             ))}
@@ -66,43 +70,51 @@ export const SafetyView: React.FC<SafetyViewProps> = ({ events, onSelectEvent })
         </div>
 
         {/* Right Column: School Zone Safety Geofence Status */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <h3 style={{ fontSize: '0.95rem', color: '#fff', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldCheck size={16} color="var(--brand-cyan)" /> HYDERABAD TRANSIT SCHOOL ZONE MONITORING
-          </h3>
+        <div className="panel" style={{ padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={16} color="var(--accent-text)" />
+              <span>School Zone Geofences</span>
+            </h3>
+            <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>Sample Geofences</span>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { name: "St. Ann's Secunderabad Zone", radius: "300m", status: "Secure", risk: "Low" },
-              { name: "St. George's Abids Zone", radius: "250m", status: "Active Traffic", risk: "Medium" },
-              { name: "Ameerpet Education Hub", radius: "200m", status: "Hazard Detected", risk: "High" },
-              { name: "Jubilee Hills Public School Zone", radius: "350m", status: "Normal Flow", risk: "Low" }
+              { name: "St. Ann's Secunderabad Zone", radius: "300m", status: "Secure", risk: "Low", sev: "low" },
+              { name: "St. George's Abids Zone", radius: "250m", status: "Active Traffic", risk: "Medium", sev: "medium" },
+              { name: "Ameerpet Education Hub", radius: "200m", status: "Hazard Detected", risk: "High", sev: "high" },
+              { name: "Jubilee Hills Public School Zone", radius: "350m", status: "Normal Flow", risk: "Low", sev: "low" }
             ].map((sz, i) => (
-              <div key={i} style={{
-                padding: '10px 12px',
-                borderRadius: '8px',
-                background: 'rgba(0,0,0,0.2)',
-                border: '1px solid var(--border-subtle)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
+              <div
+                key={i}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid var(--border-subtle)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.82rem', color: '#fff' }}>{sz.name}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Geofence: {sz.radius} around school gates</div>
+                  <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--text-primary)' }}>{sz.name}</div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Geofence: {sz.radius} perimeter</div>
                 </div>
-                <span className={`badge ${sz.risk === 'High' ? 'badge-high' : sz.risk === 'Medium' ? 'badge-medium' : 'badge-low'}`}>
+                <span className={`badge badge-${sz.sev}`} style={{ fontSize: '0.6875rem' }}>
                   {sz.risk} Risk
                 </span>
               </div>
             ))}
           </div>
 
-          <div style={{ marginTop: '16px', padding: '12px', borderRadius: '8px', background: 'rgba(0,242,254,0.05)', border: '1px solid rgba(0,242,254,0.2)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            Contextual Risk Indicators prevent false classifications by correlating pedestrian cluster size, moving vehicle proximity, and school zone metadata.
+          <div style={{ marginTop: '20px', padding: '12px 14px', borderRadius: 'var(--radius-md)', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            Contextual geofence triggers correlate camera-based pedestrian count, moving vehicle approach speed, and school calendar hours to suppress false alarms during off-peak times.
           </div>
         </div>
       </div>
     </div>
   );
 };
+export default SafetyView;

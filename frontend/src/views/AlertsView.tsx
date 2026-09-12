@@ -1,84 +1,139 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert } from '../types';
-import { Bell, ShieldAlert, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { apiClient } from '../services/api';
+import { Check, ShieldAlert } from 'lucide-react';
 
 interface AlertsViewProps {
   alerts: Alert[];
   onAcknowledgeAlert?: (id: number) => void;
 }
 
-export const AlertsView: React.FC<AlertsViewProps> = ({ alerts }) => {
+export const AlertsView: React.FC<AlertsViewProps> = ({ alerts: initialAlerts }) => {
+  const [alerts, setAlerts] = useState<Alert[]>(initialAlerts);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  const activeAlertsCount = alerts.filter(a => a.status === 'active').length;
+
+  const handleUpdateStatus = async (id: number, newStatus: 'acknowledged' | 'resolved') => {
+    setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
+    try {
+      const res = await apiClient.updateAlertStatus(id, newStatus);
+      if (res && res.persisted) {
+        setFeedback(`Alert #${id} marked as ${newStatus}.`);
+      } else {
+        setFeedback(`Alert #${id} marked as ${newStatus} (Local state updated).`);
+      }
+    } catch {
+      setFeedback(`Alert #${id} marked as ${newStatus} (Local demo mode).`);
+    }
+    setTimeout(() => setFeedback(null), 3000);
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', color: '#fff' }}>CENTRAL ALERT & DISPATCH MANAGEMENT CENTER</h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Triage, acknowledge, and assign critical road safety, defect, and incident alerts with full audit trail
+          <h2 className="heading-md" style={{ marginBottom: '4px' }}>Alerts & Triage Management Center</h2>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            Review, acknowledge, and resolve critical road safety hazards, defect alerts, and transit incidents.
           </p>
         </div>
-        <span className="badge badge-critical">{alerts.length} Active System Alerts</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {feedback && (
+            <span className="badge badge-accent animate-fade-in" style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Check size={12} /> {feedback}
+            </span>
+          )}
+          <span className="badge badge-critical" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <ShieldAlert size={13} />
+            <span>{activeAlertsCount} Active System Alerts</span>
+          </span>
+        </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-medium)', background: 'rgba(0,0,0,0.3)', color: 'var(--text-muted)' }}>
-              <th style={{ padding: '12px 16px' }}>SEVERITY</th>
-              <th style={{ padding: '12px 16px' }}>ALERT ID</th>
-              <th style={{ padding: '12px 16px' }}>TITLE & DESCRIPTION</th>
-              <th style={{ padding: '12px 16px' }}>TIMESTAMP</th>
-              <th style={{ padding: '12px 16px' }}>STATUS</th>
-              <th style={{ padding: '12px 16px' }}>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alerts.map((alt) => (
-              <tr
-                key={alt.id}
-                style={{ borderBottom: '1px solid var(--border-subtle)', transition: 'background 0.15s ease' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <td style={{ padding: '12px 16px' }}>
-                  <span className={`badge ${
-                    alt.category === 'critical' ? 'badge-critical' : alt.category === 'high' ? 'badge-high' : 'badge-medium'
-                  }`}>
-                    {alt.category}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 16px' }}>
-                  <span className="mono" style={{ fontWeight: 700, color: 'var(--text-highlight)' }}>{alt.alert_id}</span>
-                </td>
-                <td style={{ padding: '12px 16px', maxWidth: '380px' }}>
-                  <div style={{ fontWeight: 700, color: '#fff', marginBottom: '2px' }}>{alt.title}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{alt.description}</div>
-                </td>
-                <td style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>
-                  <div className="mono" style={{ fontSize: '0.75rem' }}>
-                    {new Date(alt.created_at).toLocaleTimeString()}
-                  </div>
-                </td>
-                <td style={{ padding: '12px 16px' }}>
-                  <span className="badge badge-info" style={{ fontSize: '0.7rem' }}>
-                    {alt.status.toUpperCase()}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 16px' }}>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button className="btn-secondary" style={{ fontSize: '0.7rem', padding: '4px 8px' }}>
-                      Acknowledge
-                    </button>
-                    <button className="btn-secondary" style={{ fontSize: '0.7rem', padding: '4px 8px', color: 'var(--status-low)' }}>
-                      Resolve
-                    </button>
-                  </div>
-                </td>
+      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="table-container">
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8125rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255, 255, 255, 0.02)', color: 'var(--text-muted)' }}>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Severity</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Alert ID</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Title & Description</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Detected Time</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Current Status</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Operator Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {alerts.map((alt) => (
+                <tr
+                  key={alt.id}
+                  className="clickable-row"
+                  style={{ borderBottom: '1px solid var(--border-subtle)' }}
+                >
+                  <td style={{ padding: '14px 16px' }}>
+                    <span className={`badge badge-${alt.category}`} style={{ textTransform: 'capitalize' }}>
+                      {alt.category}
+                    </span>
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{alt.alert_id}</span>
+                  </td>
+                  <td style={{ padding: '14px 16px', maxWidth: '380px' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>{alt.title}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{alt.description}</div>
+                  </td>
+                  <td style={{ padding: '14px 16px', color: 'var(--text-muted)' }}>
+                    <div className="mono" style={{ fontSize: '0.75rem' }}>
+                      {new Date(alt.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <span
+                      className={`badge ${
+                        alt.status === 'resolved'
+                          ? 'badge-low'
+                          : alt.status === 'acknowledged'
+                          ? 'badge-accent'
+                          : 'badge-critical'
+                      }`}
+                      style={{ fontSize: '0.6875rem', textTransform: 'capitalize' }}
+                    >
+                      {alt.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {alt.status !== 'acknowledged' && alt.status !== 'resolved' && (
+                        <button
+                          onClick={() => handleUpdateStatus(alt.id, 'acknowledged')}
+                          className="btn btn-secondary"
+                          style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                        >
+                          Acknowledge
+                        </button>
+                      )}
+                      {alt.status !== 'resolved' && (
+                        <button
+                          onClick={() => handleUpdateStatus(alt.id, 'resolved')}
+                          className="btn btn-secondary"
+                          style={{ fontSize: '0.75rem', padding: '4px 10px', color: '#22c55e' }}
+                        >
+                          Resolve
+                        </button>
+                      )}
+                      {alt.status === 'resolved' && (
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Resolved</span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
+export default AlertsView;
