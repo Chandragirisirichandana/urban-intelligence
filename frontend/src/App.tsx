@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { GisMap } from './components/GisMap';
 import { EventModal } from './components/EventModal';
+import { LandingPage } from './views/LandingPage';
 
 // Views
 import { OverviewView } from './views/OverviewView';
@@ -16,27 +17,79 @@ import { RoutesView } from './views/RoutesView';
 import { ReportsView } from './views/ReportsView';
 import { MlOpsView } from './views/MlOpsView';
 
-import { apiClient, DEMO_MODE, MOCK_BUSES, MOCK_ROUTES, MOCK_EVENTS, MOCK_ALERTS, MOCK_ROAD_SEGMENTS, MOCK_MAINTENANCE } from './services/api';
+import {
+  apiClient, DEMO_MODE, MOCK_BUSES, MOCK_ROUTES,
+  MOCK_EVENTS, MOCK_ALERTS, MOCK_ROAD_SEGMENTS, MOCK_MAINTENANCE
+} from './services/api';
 import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem } from './types';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+
+const getInitialViewMode = (): 'landing' | 'dashboard' => {
+  const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '';
+  return (!hash || hash === 'landing') ? 'landing' : 'dashboard';
+};
+
+const getInitialTab = (): string => {
+  const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '';
+  const validTabs = ['overview', 'live-map', 'fleet', 'roads', 'traffic', 'safety', 'incidents', 'alerts', 'routes', 'reports', 'mlops'];
+  return validTabs.includes(hash) ? hash : 'overview';
+};
 
 export const App: React.FC = () => {
+  // Navigation & View Mode
+  const [viewMode, setViewMode] = useState<'landing' | 'dashboard'>(getInitialViewMode);
+  const [activeTab, setActiveTab] = useState<string>(getInitialTab);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+
+  // Data state
   const [loadError, setLoadError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<string>('overview');
-  const [buses, setBuses] = useState<Bus[]>(DEMO_MODE ? MOCK_BUSES : []);
-  const [routes, setRoutes] = useState<Route[]>(DEMO_MODE ? MOCK_ROUTES : []);
-  const [events, setEvents] = useState<UrbanEvent[]>(DEMO_MODE ? MOCK_EVENTS : []);
-  const [alerts, setAlerts] = useState<Alert[]>(DEMO_MODE ? MOCK_ALERTS : []);
-  const [roadSegments, setRoadSegments] = useState<RoadSegment[]>(DEMO_MODE ? MOCK_ROAD_SEGMENTS : []);
-  const [maintenanceQueue, setMaintenanceQueue] = useState<MaintenanceItem[]>(DEMO_MODE ? MOCK_MAINTENANCE : []);
+  const [loading, setLoading] = useState(false);
+  const [buses, setBuses] = useState<Bus[]>(MOCK_BUSES);
+  const [routes, setRoutes] = useState<Route[]>(MOCK_ROUTES);
+  const [events, setEvents] = useState<UrbanEvent[]>(MOCK_EVENTS);
+  const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
+  const [roadSegments, setRoadSegments] = useState<RoadSegment[]>(MOCK_ROAD_SEGMENTS);
+  const [maintenanceQueue, setMaintenanceQueue] = useState<MaintenanceItem[]>(MOCK_MAINTENANCE);
 
   const [selectedEvent, setSelectedEvent] = useState<UrbanEvent | null>(null);
   const [reportEvent, setReportEvent] = useState<UrbanEvent | null>(null);
 
-  // Initial data fetch
+  // Sync with URL Hash for Browser Back/Forward support
   useEffect(() => {
-    async function loadData() {
-      try {
+    const handlePopState = () => {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (!hash || hash === 'landing') {
+        setViewMode('landing');
+      } else {
+        setViewMode('dashboard');
+        const validTabs = ['overview', 'live-map', 'fleet', 'roads', 'traffic', 'safety', 'incidents', 'alerts', 'routes', 'reports', 'mlops'];
+        if (validTabs.includes(hash)) {
+          setActiveTab(hash);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateToTab = (tab: string) => {
+    setActiveTab(tab);
+    setViewMode('dashboard');
+    window.history.pushState(null, '', `#${tab}`);
+  };
+
+  const navigateToLanding = () => {
+    setViewMode('landing');
+    window.history.pushState(null, '', '#landing');
+  };
+
+  // Initial data fetch
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
+    try {
       const [b, r, e, a, roads, maint] = await Promise.all([
         apiClient.getBuses(),
         apiClient.getRoutes(),
@@ -52,12 +105,16 @@ export const App: React.FC = () => {
       setRoadSegments(roads);
       setMaintenanceQueue(maint);
       setLoadError('');
-      } catch {
-        setLoadError('Unable to load backend data. Check the connection and refresh to retry.');
-      } finally { setLoading(false); }
+    } catch {
+      setLoadError('Unable to load backend telemetry data. Check connection and click retry.');
+    } finally {
+      setLoading(false);
     }
-    loadData();
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Live simulation ticker: updates bus GPS coordinates smoothly along their routes
   useEffect(() => {
@@ -65,7 +122,6 @@ export const App: React.FC = () => {
     const interval = setInterval(() => {
       setBuses((prevBuses) =>
         prevBuses.map((bus) => {
-          // Slight jitter/movement along heading
           const speed = Math.max(12, Math.min(50, Math.round(bus.speed + (Math.random() * 4 - 2))));
           const latDelta = (Math.random() - 0.5) * 0.0004;
           const lngDelta = (Math.random() - 0.5) * 0.0004;
@@ -74,7 +130,7 @@ export const App: React.FC = () => {
             speed,
             current_latitude: Number((bus.current_latitude + latDelta).toFixed(5)),
             current_longitude: Number((bus.current_longitude + lngDelta).toFixed(5)),
-            edge_fps: Number((20.5 + Math.random() * 3.2).toFixed(1))
+            edge_fps: Number((21.0 + Math.random() * 2.5).toFixed(1))
           };
         })
       );
@@ -105,7 +161,7 @@ export const App: React.FC = () => {
       }
       setLoadError('');
     } catch {
-      setLoadError('Unable to trigger the scenario. Check the backend connection and retry.');
+      setLoadError('Unable to trigger scenario on backend. Running in local simulation mode.');
     }
 
     // If scenario 1 (Spatial Deduplication): increment observation count of the Nampally pothole
@@ -115,11 +171,11 @@ export const App: React.FC = () => {
           evt.event_type === 'pothole'
             ? {
                 ...evt,
-                confidence: 0.95,
+                confidence: 0.96,
                 observation_count: (evt.observation_count || 1) + 1,
                 ai_reasoning: [
                   ...(evt.ai_reasoning || []),
-                  'Corroborating sighting: Re-identified by Bus TS09-3207. Confidence reinforced to 95%.'
+                  'Corroborating sighting: Re-identified by Bus TS09-3207. Confidence reinforced to 96%.'
                 ]
               }
             : evt
@@ -131,103 +187,207 @@ export const App: React.FC = () => {
   const handleOpenReport = (evt: UrbanEvent) => {
     setSelectedEvent(null);
     setReportEvent(evt);
-    setActiveTab('reports');
+    navigateToTab('reports');
   };
 
+  // Render Landing Page
+  if (viewMode === 'landing') {
+    return (
+      <LandingPage
+        onOpenDashboard={(tab: string = 'overview') => {
+          navigateToTab(tab || 'overview');
+        }}
+      />
+    );
+  }
+
+  const activeCriticalAlerts = alerts.filter(a => a.status === 'active' && a.category === 'critical').length;
+  const totalActiveAlerts = alerts.filter(a => a.status === 'active').length;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
-      <div role="status" style={{ padding: '12px 20px', color: '#fff', background: '#283344' }}>
-        {DEMO_MODE ? 'DEMO MODE — simulated events, locations and metrics.' : 'BACKEND MODE — prototype; some analytical panels still contain illustrative metrics. Backend records may include simulation data.'}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-root)' }}>
+      {/* Mode Status Banner */}
+      <div
+        style={{
+          padding: '6px 20px',
+          background: 'rgba(24, 24, 27, 0.95)',
+          borderBottom: '1px solid var(--border-subtle)',
+          fontSize: '0.75rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          color: 'var(--text-secondary)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: DEMO_MODE ? '#22c55e' : '#3b82f6',
+            }}
+          />
+          <span>
+            {DEMO_MODE
+              ? 'SIMULATION MODE — Hyderabad transit fleet synthetic telemetry active.'
+              : 'BACKEND MODE — Connected to live edge API service.'}
+          </span>
+        </div>
+
+        <button
+          onClick={navigateToLanding}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--accent-text)',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          View Landing Page →
+        </button>
       </div>
-      {loading && <p role="status">Loading data…</p>}
-      {loadError && <p role="alert" style={{ color: '#ffb4b4', padding: '12px 20px' }}>{loadError}</p>}
+
+      {/* Load error notification */}
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            margin: '12px 16px 0',
+            padding: '10px 16px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--severity-critical-muted)',
+            border: '1px solid rgba(220, 38, 38, 0.4)',
+            color: '#fca5a5',
+            fontSize: '0.8125rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={16} />
+            <span>{loadError}</span>
+          </div>
+          <button
+            onClick={loadData}
+            className="btn btn-secondary"
+            style={{ fontSize: '0.75rem', padding: '4px 10px', gap: '4px' }}
+          >
+            <RefreshCw size={12} />
+            <span>Retry</span>
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        activeAlertsCount={alerts.filter(a => a.status === 'active' && a.category === 'critical').length}
+        setActiveTab={navigateToTab}
+        activeAlertsCount={activeCriticalAlerts}
         activeBusesCount={buses.length}
         onTriggerDemo={handleTriggerDemo}
+        onGoLanding={navigateToLanding}
+        onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
       />
 
-      {/* Main App Body */}
+      {/* Main Dashboard Layout */}
       <div style={{ display: 'flex', flex: 1, paddingRight: '16px' }}>
         {/* Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          alertsCount={alerts.filter(a => a.status === 'active').length}
+          setActiveTab={navigateToTab}
+          alertsCount={totalActiveAlerts}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
+          mobileOpen={mobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
+          busesCount={buses.length}
         />
 
         {/* View Content Area */}
-        <main style={{ flex: 1, padding: '0 0 20px 16px', overflowY: 'auto' }}>
-          {activeTab === 'overview' && (
-            <OverviewView
-              buses={buses}
-              events={events}
-              alerts={alerts}
-              roadSegments={roadSegments}
-              routes={routes}
-              onSelectEvent={(evt) => setSelectedEvent(evt)}
-              setActiveTab={setActiveTab}
-            />
-          )}
-
-          {activeTab === 'live-map' && (
-            <div className="glass-panel" style={{ padding: '14px' }}>
-              <h2 style={{ fontSize: '1.25rem', marginBottom: '12px', color: '#fff' }}>
-                FULLSCREEN GIS SITUATIONAL OPERATIONS MAP
-              </h2>
-              <GisMap
-                buses={buses}
-                routes={routes}
-                events={events}
-                onSelectEvent={(evt) => setSelectedEvent(evt)}
-                height="calc(100vh - 170px)"
-              />
+        <main style={{ flex: 1, padding: '0 0 24px 16px', overflowY: 'auto' }}>
+          {loading && (
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+              <div style={{ width: '28px', height: '28px', border: '3px solid var(--border-default)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 12px' }} />
+              <div style={{ fontSize: '0.875rem' }}>Synchronizing edge telemetry stream...</div>
             </div>
           )}
 
-          {activeTab === 'fleet' && <FleetView buses={buses} routes={routes} />}
+          {!loading && (
+            <>
+              {activeTab === 'overview' && (
+                <OverviewView
+                  buses={buses}
+                  events={events}
+                  alerts={alerts}
+                  roadSegments={roadSegments}
+                  routes={routes}
+                  onSelectEvent={(evt) => setSelectedEvent(evt)}
+                  setActiveTab={navigateToTab}
+                />
+              )}
 
-          {activeTab === 'roads' && (
-            <RoadView
-              roadSegments={roadSegments}
-              events={events}
-              maintenanceQueue={maintenanceQueue}
-              onSelectEvent={(evt) => setSelectedEvent(evt)}
-            />
+              {activeTab === 'live-map' && (
+                <div className="panel" style={{ padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <h2 className="heading-sm">Fullscreen GIS Situational Operations Map</h2>
+                    <span className="badge badge-accent">Interactive Leaflet GIS</span>
+                  </div>
+                  <GisMap
+                    buses={buses}
+                    routes={routes}
+                    events={events}
+                    onSelectEvent={(evt) => setSelectedEvent(evt)}
+                    height="calc(100vh - 190px)"
+                  />
+                </div>
+              )}
+
+              {activeTab === 'fleet' && <FleetView buses={buses} routes={routes} />}
+
+              {activeTab === 'roads' && (
+                <RoadView
+                  roadSegments={roadSegments}
+                  events={events}
+                  maintenanceQueue={maintenanceQueue}
+                  onSelectEvent={(evt) => setSelectedEvent(evt)}
+                />
+              )}
+
+              {activeTab === 'traffic' && <TrafficView events={events} />}
+
+              {activeTab === 'safety' && (
+                <SafetyView
+                  events={events}
+                  onSelectEvent={(evt) => setSelectedEvent(evt)}
+                />
+              )}
+
+              {activeTab === 'incidents' && (
+                <IncidentsView
+                  events={events}
+                  onSelectEvent={(evt) => setSelectedEvent(evt)}
+                  onOpenReport={handleOpenReport}
+                />
+              )}
+
+              {activeTab === 'alerts' && <AlertsView alerts={alerts} />}
+
+              {activeTab === 'routes' && <RoutesView routes={routes} />}
+
+              {activeTab === 'reports' && (
+                <ReportsView
+                  events={events}
+                  initialSelectedEvent={reportEvent || events[0]}
+                />
+              )}
+
+              {activeTab === 'mlops' && <MlOpsView />}
+            </>
           )}
-
-          {activeTab === 'traffic' && <TrafficView events={events} />}
-
-          {activeTab === 'safety' && (
-            <SafetyView
-              events={events}
-              onSelectEvent={(evt) => setSelectedEvent(evt)}
-            />
-          )}
-
-          {activeTab === 'incidents' && (
-            <IncidentsView
-              events={events}
-              onSelectEvent={(evt) => setSelectedEvent(evt)}
-              onOpenReport={handleOpenReport}
-            />
-          )}
-
-          {activeTab === 'alerts' && <AlertsView alerts={alerts} />}
-
-          {activeTab === 'routes' && <RoutesView routes={routes} />}
-
-          {activeTab === 'reports' && (
-            <ReportsView
-              events={events}
-              initialSelectedEvent={reportEvent || events[0]}
-            />
-          )}
-
-          {activeTab === 'mlops' && <MlOpsView />}
         </main>
       </div>
 

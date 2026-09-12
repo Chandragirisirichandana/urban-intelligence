@@ -1,10 +1,10 @@
 /**
  * Urban Intelligence Platform - API Service & Demo Data Provider
  */
-import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem, SystemStats } from '../types';
+import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem } from '../types';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
-export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || import.meta.env.VITE_DEMO_MODE === undefined;
 
 // Initial fallback mock data for Hyderabad city
 export const MOCK_BUSES: Bus[] = [
@@ -192,11 +192,16 @@ export const MOCK_MAINTENANCE: MaintenanceItem[] = [
 
 async function getCollection<T>(path: string, demoData: T[]): Promise<T[]> {
   if (DEMO_MODE) return demoData;
-  const response = await fetch(`${API_BASE}${path}`, { signal: AbortSignal.timeout(10000) });
-  if (!response.ok) throw new Error(`API request failed (${response.status})`);
-  const data: unknown = await response.json();
-  if (!Array.isArray(data)) throw new Error('Unexpected API response');
-  return data as T[];
+  try {
+    const response = await fetch(`${API_BASE}${path}`, { signal: AbortSignal.timeout(3000) });
+    if (!response.ok) throw new Error(`API request failed (${response.status})`);
+    const data: unknown = await response.json();
+    if (!Array.isArray(data)) throw new Error('Unexpected API response');
+    return data as T[];
+  } catch (err) {
+    console.warn(`Connection to ${path} failed, falling back to demo data:`, err);
+    return demoData;
+  }
 }
 
 const BACKEND_SCENARIOS = [
@@ -228,5 +233,41 @@ export const apiClient = {
     });
     if (!response.ok) throw new Error(`Scenario request failed (${response.status})`);
     return response.json();
+  },
+  async updateEventStatus(id: number, status: string) {
+    if (DEMO_MODE) return { success: true, id, status, simulated: true };
+    try {
+      const response = await fetch(`${API_BASE}/events/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) {
+        // Fallback for demo when backend lacks this route
+        return { success: false, persisted: false, status };
+      }
+      return await response.json();
+    } catch {
+      return { success: false, persisted: false, status };
+    }
+  },
+  async updateAlertStatus(id: number, status: string) {
+    if (DEMO_MODE) return { success: true, id, status, simulated: true };
+    try {
+      const response = await fetch(`${API_BASE}/alerts/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) {
+        return { success: false, persisted: false, status };
+      }
+      return await response.json();
+    } catch {
+      return { success: false, persisted: false, status };
+    }
   }
 };
+
