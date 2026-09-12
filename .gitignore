@@ -71,3 +71,4 @@ backend/evidence/
 tmp/
 temp/
 scratch/
+backend/.venv312/
