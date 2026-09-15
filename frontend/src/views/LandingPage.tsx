@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight, Activity, Map, ShieldCheck } from 'lucide-react';
-
+import './LandingPage.css';
 interface LandingPageProps {
   onOpenDashboard: (tab?: string) => void;
 }
