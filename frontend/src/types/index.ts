@@ -21,6 +21,104 @@ export type EventStatus =
   | 'resolved'
   | 'false_positive';
 
+export type HazardStatus =
+  | 'new'
+  | 'verified'
+  | 'reported'
+  | 'repair_in_progress'
+  | 'resolved';
+
+export type HazardType =
+  | 'pothole'
+  | 'damaged_road'
+  | 'waterlogging'
+  | 'accident'
+  | 'congestion';
+
+export interface Hazard {
+  id: number;
+  hazard_id: string;
+  hazard_type: HazardType;
+  severity: SeverityLevel;
+  confidence: number;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+  last_observed: string;
+  observation_count: number;
+  status: HazardStatus;
+  description: string;
+  source_buses: number[];
+  evidence_path?: string;
+  ai_reasoning?: string[];
+  is_simulated: boolean;
+}
+
+export interface RouteOption {
+  id: string;
+  name: string;
+  distance_km: number;
+  eta_minutes: number;
+  hazard_count: number;
+  severe_hazards: number;
+  moderate_hazards: number;
+  minor_hazards: number;
+  waypoints: [number, number][];
+}
+
+export interface NavigationState {
+  currentLocation: [number, number] | null;
+  destination: [number, number] | null;
+  destinationName: string;
+  selectedRoute: RouteOption | null;
+  alternativeRoutes: RouteOption[];
+  hazardsAlongRoute: Hazard[];
+  isCalculating: boolean;
+  gpsStatus: 'active' | 'unavailable' | 'simulated';
+  gpsAccuracy?: number;
+  lastGpsUpdate?: string;
+  warning?: HazardWarning;
+  showHazardPanel: boolean;
+  selectedHazard: Hazard | null;
+  mapStyle: 'map' | 'satellite';
+  corridorThreshold: number; // meters
+}
+
+export interface HazardWarning {
+  hazard: Hazard;
+  distanceMeters: number;
+  timeToArrivalSeconds: number;
+  isNewWarning: boolean;
+}
+
+export interface RouteSummary {
+  distance_km: number;
+  eta_minutes: number;
+  hazard_count: number;
+  severe_count: number;
+  moderate_count: number;
+  minor_count: number;
+  waterlogging_count: number;
+  accident_count: number;
+}
+
+export interface HazardCluster {
+  id: number;
+  cluster_id: string;
+  hazard_type: HazardType;
+  severity: SeverityLevel;
+  confidence: number;
+  latitude: number;
+  longitude: number;
+  observation_count: number;
+  first_observed: string;
+  last_observed: string;
+  bus_count: number;
+  status: HazardStatus;
+}
+
+export type MapStyle = 'map' | 'satellite';
+
 export type EventType =
   | 'pothole'
   | 'crack'

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   LayoutDashboard, Map, Bus, AlertOctagon, Car, Users,
-  Camera, FileText, Cpu, Bell, Route, ChevronLeft, ChevronRight, X
+  Camera, FileText, Cpu, Bell, Route, ChevronLeft, ChevronRight, X, Navigation
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -28,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const menuItems = [
     { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
     { id: 'live-map', label: 'Live GIS Map', icon: Map },
+    { id: 'navigation', label: 'Smart Navigation', icon: Navigation },
     { id: 'fleet', label: 'Bus Fleet', icon: Bus },
     { id: 'roads', label: 'Road Quality', icon: AlertOctagon },
     { id: 'traffic', label: 'Traffic & Flow', icon: Car },
