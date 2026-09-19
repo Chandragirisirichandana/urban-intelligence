@@ -22,6 +22,7 @@ from app.api.routes.analytics import (
     alerts_router, roads_router, analytics_router,
     routes_router, system_router
 )
+from app.api.routes.navigation import router as navigation_router
 
 
 @asynccontextmanager
@@ -85,6 +86,7 @@ app.include_router(roads_router)
 app.include_router(analytics_router)
 app.include_router(routes_router)
 app.include_router(system_router)
+app.include_router(navigation_router)
 
 
 @app.get("/", tags=["Root"])

@@ -16,6 +16,7 @@ import { AlertsView } from './views/AlertsView';
 import { RoutesView } from './views/RoutesView';
 import { ReportsView } from './views/ReportsView';
 import { MlOpsView } from './views/MlOpsView';
+import { NavigationView } from './views/NavigationView';
 
 import {
   apiClient, DEMO_MODE, MOCK_BUSES, MOCK_ROUTES,
@@ -63,7 +64,7 @@ export const App: React.FC = () => {
         setViewMode('landing');
       } else {
         setViewMode('dashboard');
-        const validTabs = ['overview', 'live-map', 'fleet', 'roads', 'traffic', 'safety', 'incidents', 'alerts', 'routes', 'reports', 'mlops'];
+const validTabs = ['overview', 'live-map', 'navigation', 'fleet', 'roads', 'traffic', 'safety', 'incidents', 'alerts', 'routes', 'reports', 'mlops'];
         if (validTabs.includes(hash)) {
           setActiveTab(hash);
         }
@@ -377,6 +378,14 @@ export const App: React.FC = () => {
               {activeTab === 'alerts' && <AlertsView alerts={alerts} />}
 
               {activeTab === 'routes' && <RoutesView routes={routes} />}
+
+              {activeTab === 'navigation' && (
+                <NavigationView
+                  buses={buses}
+                  routes={routes}
+                  events={events}
+                />
+              )}
 
               {activeTab === 'reports' && (
                 <ReportsView

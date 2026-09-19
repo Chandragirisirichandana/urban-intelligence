@@ -1,10 +1,66 @@
 /**
  * Urban Intelligence Platform - API Service & Demo Data Provider
  */
-import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem } from '../types';
+import { Bus, Route, UrbanEvent, Alert, RoadSegment, MaintenanceItem, Hazard, RouteOption } from '../types';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || import.meta.env.VITE_DEMO_MODE === undefined;
+
+// ─── Geospatial helpers (used by demo fallback) ──────────────────────────────
+
+function radians(deg: number): number {
+  return deg * Math.PI / 180;
+}
+
+function haversineDist(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = radians(lat2 - lat1);
+  const dLon = radians(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(radians(lat1)) * Math.cos(radians(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+const EARTH_R = 6371000;
+function latToY(lat: number): number { return radians(lat) * EARTH_R; }
+function yToLat(y: number): number { return (y / EARTH_R) * 180 / Math.PI; }
+function lngToX(lng: number, refLat: number): number { return radians(lng) * EARTH_R * Math.cos(radians(refLat)); }
+
+function pointToSegmentDistance(
+  lat: number, lng: number,
+  segA: [number, number], segB: [number, number]
+): number {
+  const refLat = (segA[0] + segB[0]) / 2;
+  const px = lngToX(lng, refLat);
+  const py = latToY(lat);
+  const x1 = lngToX(segA[1], refLat);
+  const y1 = latToY(segA[0]);
+  const x2 = lngToX(segB[1], refLat);
+  const y2 = latToY(segB[0]);
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const segLenSq = dx * dx + dy * dy;
+
+  if (segLenSq < 1e-10) {
+    return haversineDist(lat, lng, segA[0], segA[1]);
+  }
+
+  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / segLenSq));
+  return haversineDist(lat, lng, yToLat(y1 + t * dy), lng);
+}
+
+function pointToRouteDistance(lat: number, lng: number, waypoints: [number, number][]): number {
+  let minDist = Infinity;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const d = pointToSegmentDistance(lat, lng, waypoints[i], waypoints[i + 1]);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
+}
+
+// ─── Mock / Demo Data ────────────────────────────────────────────────────────
 
 // Initial fallback mock data for Hyderabad city
 export const MOCK_BUSES: Bus[] = [
@@ -190,6 +246,92 @@ export const MOCK_MAINTENANCE: MaintenanceItem[] = [
   { id: 4, title: 'Repair Struck Road Divider at Begumpet', description: 'Central concrete divider cracked and shifted post-incident.', defect_type: 'damaged_divider', severity: 'high', priority_score: 82.0, observation_count: 5, latitude: 17.4580, longitude: 78.4100, status: 'in_progress', road_segment_id: 2 }
 ];
 
+// ─── Navigation Demo Hazard Data ──────────────────────────────────────────────
+// Hazards from the Urban Intelligence edge pipeline (Bus 12, 7, 8, etc.) on Hyderabad corridors
+export const MOCK_HAZARDS: Hazard[] = [
+  {
+    id: 1, hazard_id: 'PH-1001', hazard_type: 'pothole', severity: 'high', confidence: 0.92,
+    latitude: 17.4400, longitude: 78.4980,
+    timestamp: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+    last_observed: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+    observation_count: 3, status: 'verified',
+    description: 'Deep road surface crater (0.8m diameter) in central traffic lane on Nampally Main Road',
+    source_buses: [12, 7, 3], evidence_path: '/evidence/pothole_01.jpg',
+    ai_reasoning: ['Pothole detected with 92% model confidence via Edge YOLOv8s'],
+    is_simulated: true,
+  },
+  {
+    id: 2, hazard_id: 'PH-1002', hazard_type: 'pothole', severity: 'medium', confidence: 0.68,
+    latitude: 17.4150, longitude: 78.4700,
+    timestamp: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+    last_observed: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+    observation_count: 2, status: 'reported',
+    description: 'Moderate pavement depression on service lane near Charminar',
+     source_buses: [8, 2],
+     ai_reasoning: ['Moderate pothole detected with 68% confidence'],
+    is_simulated: true,
+  },
+  {
+    id: 3, hazard_id: 'WL-001', hazard_type: 'waterlogging', severity: 'critical', confidence: 0.95,
+    latitude: 17.3850, longitude: 78.4750,
+    timestamp: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
+    last_observed: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    observation_count: 4, status: 'reported',
+    description: 'Severe water accumulation (>15cm) blocking Charminar transit lane',
+    source_buses: [8, 1],
+    ai_reasoning: ['Reflective water plane detected across 40% of road surface'],
+    is_simulated: true,
+  },
+  {
+    id: 4, hazard_id: 'PH-1003', hazard_type: 'pothole', severity: 'critical', confidence: 0.96,
+    latitude: 17.4580, longitude: 78.4100,
+    timestamp: new Date(Date.now() - 75 * 60 * 1000).toISOString(),
+    last_observed: new Date(Date.now() - 75 * 60 * 1000).toISOString(),
+    observation_count: 2, status: 'new',
+    description: 'Large pothole near Begumpet flyover approach',
+    source_buses: [11, 4],
+    ai_reasoning: ['Large depression detected with 96% confidence'],
+    is_simulated: true,
+  },
+  {
+    id: 5, hazard_id: 'CR-201', hazard_type: 'damaged_road', severity: 'low', confidence: 0.56,
+    latitude: 17.4200, longitude: 78.4550,
+    timestamp: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+    last_observed: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    observation_count: 1, status: 'new',
+    description: 'Longitudinal crack on Lakdi Ka Pul approach road',
+    source_buses: [12],
+    ai_reasoning: ['Surface crack detected with 56% confidence'],
+    is_simulated: true,
+  },
+];
+
+export const MOCK_ROUTE_OPTIONS: RouteOption[] = [
+  {
+    id: 'route_a', name: 'Primary Route',
+    distance_km: 8.4, eta_minutes: 24, hazard_count: 8,
+    severe_hazards: 2, moderate_hazards: 3, minor_hazards: 3,
+    waypoints: [
+      [17.4400, 78.4980], [17.4350, 78.4920], [17.4280, 78.4860],
+      [17.4200, 78.4800], [17.4100, 78.4750], [17.4000, 78.4700],
+      [17.3900, 78.4650], [17.3850, 78.4750],
+    ],
+  },
+  {
+    id: 'route_b', name: 'Via Tank Bund Road',
+    distance_km: 8.8, eta_minutes: 25, hazard_count: 2,
+    severe_hazards: 0, moderate_hazards: 1, minor_hazards: 1,
+    waypoints: [
+      [17.4400, 78.4980], [17.4350, 78.5050], [17.4300, 78.5100],
+      [17.4250, 78.5150], [17.4200, 78.5200], [17.4150, 78.5250],
+      [17.4100, 78.5300], [17.4000, 78.5350], [17.3900, 78.5400],
+      [17.3850, 78.4750],
+    ],
+  },
+];
+
+// ─── API Helpers ──────────────────────────────────────────────────────────────
+
 async function getCollection<T>(path: string, demoData: T[]): Promise<T[]> {
   if (DEMO_MODE) return demoData;
   try {
@@ -204,6 +346,8 @@ async function getCollection<T>(path: string, demoData: T[]): Promise<T[]> {
   }
 }
 
+// ─── Backend Scenario Seed Data ─────────────────────────────────────────────
+
 const BACKEND_SCENARIOS = [
   { event_type: 'pothole', severity: 'high', confidence: 0.92, latitude: 17.4400, longitude: 78.4980, bus_id: 12, description: 'Deep road surface crater detected on Nampally Main Road' },
   { event_type: 'pothole', severity: 'high', confidence: 0.95, latitude: 17.4402, longitude: 78.4981, bus_id: 7, description: 'Corroborating pothole sighting for spatial deduplication' },
@@ -213,6 +357,8 @@ const BACKEND_SCENARIOS = [
   { event_type: 'hit_and_run', severity: 'critical', confidence: 0.93, latitude: 17.4580, longitude: 78.4100, bus_id: 11, description: 'Hit-and-run incident with vehicle departure near Begumpet' },
 ];
 
+// ─── API Client ────────────────────────────────────────────────────────────────
+
 export const apiClient = {
   getBuses: () => getCollection('/buses/', MOCK_BUSES),
   getRoutes: () => getCollection('/routes/', MOCK_ROUTES),
@@ -220,6 +366,7 @@ export const apiClient = {
   getAlerts: () => getCollection('/alerts/', MOCK_ALERTS),
   getRoadSegments: () => getCollection('/roads/segments', MOCK_ROAD_SEGMENTS),
   getMaintenanceQueue: () => getCollection('/roads/maintenance-queue', MOCK_MAINTENANCE),
+
   async triggerDemoScenario(scenarioIndex: number) {
     if (DEMO_MODE) return { status: 'simulated_locally', scenarioIndex };
 
@@ -234,6 +381,7 @@ export const apiClient = {
     if (!response.ok) throw new Error(`Scenario request failed (${response.status})`);
     return response.json();
   },
+
   async updateEventStatus(id: number, status: string) {
     if (DEMO_MODE) return { success: true, id, status, simulated: true };
     try {
@@ -244,7 +392,6 @@ export const apiClient = {
         signal: AbortSignal.timeout(5000),
       });
       if (!response.ok) {
-        // Fallback for demo when backend lacks this route
         return { success: false, persisted: false, status };
       }
       return await response.json();
@@ -252,6 +399,7 @@ export const apiClient = {
       return { success: false, persisted: false, status };
     }
   },
+
   async updateAlertStatus(id: number, status: string) {
     if (DEMO_MODE) return { success: true, id, status, simulated: true };
     try {
@@ -268,6 +416,154 @@ export const apiClient = {
     } catch {
       return { success: false, persisted: false, status };
     }
-  }
-};
+  },
 
+  // ─── Pothole-Aware Navigation API ───────────────────────────────────────────
+
+  async getHazardsNearRoute(
+    waypoints: [number, number][],
+    corridor: number = 50
+  ): Promise<Hazard[]> {
+    if (DEMO_MODE) {
+      const result: Hazard[] = [];
+      for (const h of MOCK_HAZARDS) {
+        if (pointToRouteDistance(h.latitude, h.longitude, waypoints) <= corridor) {
+          result.push(h);
+        }
+      }
+      return result;
+    }
+    try {
+      const wpStr = JSON.stringify(waypoints);
+      const response = await fetch(
+        `${API_BASE}/navigation/hazards/near-route?waypoints=${encodeURIComponent(wpStr)}&corridor=${corridor}`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return (await response.json()) as Hazard[];
+    } catch {
+      return MOCK_HAZARDS;
+    }
+  },
+
+  async analyzeRoute(
+    origin: [number, number],
+    destination: [number, number],
+    corridor: number = 50
+  ): Promise<any> {
+    if (DEMO_MODE) {
+      const route = MOCK_ROUTE_OPTIONS[0];
+      const hazardsOnRoute = MOCK_HAZARDS.filter(h =>
+        pointToRouteDistance(h.latitude, h.longitude, route.waypoints) <= corridor
+      );
+      return {
+        route: {
+          waypoints: route.waypoints,
+          distance_km: route.distance_km,
+          eta_minutes: route.eta_minutes,
+          source: 'simulated',
+        },
+        alternatives: MOCK_ROUTE_OPTIONS.slice(1).map(alt => ({
+          id: alt.id,
+          name: alt.name,
+          waypoints: alt.waypoints,
+          distance_km: alt.distance_km,
+          eta_minutes: alt.eta_minutes,
+          hazard_count: alt.hazard_count,
+          severe_hazards: alt.severe_hazards,
+        })),
+        hazards: hazardsOnRoute,
+        summary: {
+          distance_km: route.distance_km,
+          eta_minutes: route.eta_minutes,
+          hazard_count: hazardsOnRoute.length,
+          severe_count: hazardsOnRoute.filter(h => h.severity === 'critical').length,
+          moderate_count: hazardsOnRoute.filter(h => h.severity === 'high').length,
+          minor_count: hazardsOnRoute.filter(h => h.severity === 'medium').length,
+          waterlogging_count: hazardsOnRoute.filter(h => h.hazard_type === 'waterlogging').length,
+          accident_count: 0,
+        },
+        corridor_meters: corridor,
+        simulated: true,
+      };
+    }
+    try {
+      const response = await fetch(
+        `${API_BASE}/navigation/route-analysis?origin_lat=${origin[0]}&origin_lng=${origin[1]}&dest_lat=${destination[0]}&dest_lng=${destination[1]}&corridor=${corridor}`,
+        { signal: AbortSignal.timeout(10000) }
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch {
+      const route = MOCK_ROUTE_OPTIONS[0];
+      return {
+        route: { waypoints: route.waypoints, distance_km: route.distance_km, eta_minutes: route.eta_minutes, source: 'fallback' },
+        alternatives: [],
+        hazards: MOCK_HAZARDS.filter(h => pointToRouteDistance(h.latitude, h.longitude, route.waypoints) <= corridor),
+        summary: { distance_km: route.distance_km, eta_minutes: route.eta_minutes, hazard_count: 0, severe_count: 0, moderate_count: 0, minor_count: 0, waterlogging_count: 0, accident_count: 0 },
+        corridor_meters: corridor,
+        simulated: true,
+      };
+    }
+  },
+
+  async getHazardDetail(hazardId: number): Promise<any> {
+    if (DEMO_MODE) {
+      const h = MOCK_HAZARDS.find(h => h.id === hazardId) || MOCK_HAZARDS[0];
+      return {
+        ...h,
+        observations: MOCK_HAZARDS.filter(oh => oh.id === hazardId),
+        evidence_available: !!h.evidence_path,
+      };
+    }
+    try {
+      const response = await fetch(`${API_BASE}/navigation/hazards/${hazardId}`, { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch {
+      return MOCK_HAZARDS.find(h => h.id === hazardId) || null;
+    }
+  },
+
+  async updateHazardStatus(hazardId: number, status: string): Promise<any> {
+    if (DEMO_MODE) return { success: true, id: hazardId, status, simulated: true };
+    try {
+      const response = await fetch(`${API_BASE}/navigation/hazards/${hazardId}/status?status=${encodeURIComponent(status)}`, {
+        method: 'PATCH',
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch {
+      return { success: false, persisted: false, status };
+    }
+  },
+
+  async getLiveTelemetry(busId?: number): Promise<any> {
+    if (DEMO_MODE) {
+      return {
+        timestamp: new Date().toISOString(),
+        buses: MOCK_BUSES.map(b => ({
+          id: b.id,
+          bus_number: b.bus_number,
+          latitude: b.current_latitude,
+          longitude: b.current_longitude,
+          speed_kmh: b.speed,
+          heading: b.heading || 0,
+          is_simulated: true,
+          last_update: new Date().toISOString(),
+        })),
+      };
+    }
+    const url = busId
+      ? `${API_BASE}/navigation/live-telemetry?bus_id=${busId}`
+      : `${API_BASE}/navigation/live-telemetry`;
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch {
+      return { timestamp: new Date().toISOString(), buses: [], is_simulated: true };
+    }
+  },
+};

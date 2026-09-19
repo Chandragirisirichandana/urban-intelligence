@@ -54,12 +54,28 @@ class Settings(BaseSettings):
     SIMULATOR_EVENT_INTERVAL_SECONDS: int = 5
     SIMULATOR_CITY: str = "hyderabad"
 
-    # Evidence
-    EVIDENCE_DIR: str = "./evidence"
-    MAX_EVIDENCE_RETENTION_DAYS: int = 90
-
     # Logging
     LOG_LEVEL: str = "INFO"
+    LOG_FILE: str = "logs/urban_intelligence.log"
+
+    # Evidence Storage
+    EVIDENCE_DIR: str = "evidence"
+    MAX_EVIDENCE_RETENTION_DAYS: int = 90
+
+    # -----------------------------------------------------------------------------
+    # MAP PROVIDERS
+    # -----------------------------------------------------------------------------
+    MAP_TILE_PROVIDER: str = "cartodb_dark"
+    MAP_SATELLITE_KEY: Optional[str] = None
+    MAP_SATELLITE_URL: Optional[str] = None
+
+    # -----------------------------------------------------------------------------
+    # NAVIGATION (Pothole-Aware Routing)
+    # -----------------------------------------------------------------------------
+    NAVIGATION_ROUTING_PROVIDER: Optional[str] = None  # e.g., "osrm", "google_maps", "openrouteservice"
+    NAVIGATION_ROUTING_API_KEY: Optional[str] = None
+    NAVIGATION_DEFAULT_CORRIDOR_METERS: float = 50.0
+    NAVIGATION_WARNING_DISTANCE_METERS: float = 200.0
 
     @property
     def cors_origins_list(self) -> List[str]:

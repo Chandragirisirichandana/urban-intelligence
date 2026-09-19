@@ -1,6 +1,4 @@
-"""
-Urban Intelligence Platform - Events API Routes
-"""
+"""Urban Intelligence Platform - Events API Routes"""
 import uuid
 from math import radians, cos, sin, asin, sqrt
 from fastapi import APIRouter, Depends, HTTPException, Query

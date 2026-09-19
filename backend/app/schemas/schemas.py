@@ -1,6 +1,4 @@
-"""
-Urban Intelligence Platform - Pydantic Schemas for API Validation
-"""
+"""Urban Intelligence Platform - Pydantic Schemas for API Validation"""
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, EmailStr
